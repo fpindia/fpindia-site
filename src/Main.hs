@@ -5,14 +5,16 @@ module Main where
 
 import Data.Generics.Sum.Any (AsAny (_As))
 import Data.SOP (I (I), NP (Nil, (:*)))
+import Data.Some
 import Data.Time (UTCTime)
 import Ema
+import Ema.CLI qualified
 import Ema.Route.Generic
-import FPIndia.Common (tailwindLayout)
-import FPIndia.StaticRoute (StaticRoute (StaticRoute), staticFilesDynamic)
+import FPIndia.StaticRoute (StaticRoute (StaticRoute), staticFilesDynamic, staticRouteUrl)
 import Generics.SOP qualified as SOP
 import Optics.Core (Prism', (%))
 import System.FilePath ((</>))
+import Text.Blaze.Html.Renderer.Utf8 qualified as RU
 import Text.Blaze.Html5 ((!))
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
@@ -54,43 +56,57 @@ data HtmlRoute
     via (HtmlRoute `WithModel` ())
 
 data Model = Model
-  { modelFiles :: Map FilePath UTCTime
+  { modelCliAction :: Some Ema.CLI.Action
+  , modelFiles :: Map FilePath UTCTime
   }
   deriving stock (Eq, Show)
-
-emptyModel :: Model
-emptyModel = Model mempty
 
 staticDir :: FilePath
 staticDir = "static"
 
 instance EmaSite Route where
-  siteInput _ _ = do
+  siteInput cliAct _ = do
     filesDyn <- staticFilesDynamic staticDir
-    pure $ Model <$> filesDyn
-  siteOutput rp _m = \case
+    pure $ Model cliAct <$> filesDyn
+  siteOutput rp m = \case
     Route_Html r ->
-      Ema.AssetGenerated Ema.Html $ renderHtmlRoute (rp % (_As @"Route_Html")) r
+      Ema.AssetGenerated Ema.Html $ renderHtmlRoute rp m r
     Route_Static (StaticRoute path) ->
       Ema.AssetStatic $ staticDir </> path
 
-renderHtmlRoute :: Prism' FilePath HtmlRoute -> HtmlRoute -> LByteString
-renderHtmlRoute rp r = do
-  tailwindLayout (H.title "FPIndia" >> H.base ! A.href "/") $
-    H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
-      H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
-      case r of
-        HtmlRoute_Index -> do
-          "You are on the index page. "
-          routeElem HtmlRoute_About "Go to About"
-        HtmlRoute_About -> do
-          routeElem HtmlRoute_Index "Go to Index"
-          ". You are on the about page. "
+renderHtmlRoute :: Prism' FilePath Route -> Model -> HtmlRoute -> LByteString
+renderHtmlRoute rp m r = do
+  RU.renderHtml $ do
+    H.docType
+    renderHead rp m
+    renderBody rp m r
+
+renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
+renderBody rp _m r = do
+  H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
+    H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
+    case r of
+      HtmlRoute_Index -> do
+        "You are on the index page. "
+        routeElem HtmlRoute_About "Go to About"
+      HtmlRoute_About -> do
+        routeElem HtmlRoute_Index "Go to Index"
+        ". You are on the about page. "
   where
     routeElem r' w = do
-      H.a ! A.class_ "text-red-500 hover:underline" ! routeHref r' $ w
+      H.a ! A.class_ "text-red-500 hover:underline" ! routeHref (Route_Html r') $ w
     routeHref r' =
       A.href (fromString . toString $ Ema.routeUrl rp r')
+
+renderHead :: Prism' FilePath Route -> Model -> H.Html
+renderHead rp model = do
+  H.meta ! A.charset "UTF-8"
+  -- This makes the site mobile friendly by default.
+  H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1"
+  H.title "FPIndia"
+  H.base ! A.href "/"
+  -- H.link ! A.href (staticUrlTo rp "logo.svg") ! A.rel "icon"
+  H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl (modelCliAction model) (rp % (_As @"Route_Static")) (modelFiles model) "tailwind.css")
 
 main :: IO ()
 main = void $ Ema.runSite @Route ()
