@@ -9,9 +9,10 @@ import Data.Time (UTCTime)
 import Ema
 import Ema.Route.Generic
 import FPIndia.Common (tailwindLayout)
-import FPIndia.StaticRoute (StaticRoute)
+import FPIndia.StaticRoute (StaticRoute (StaticRoute), staticFilesDynamic)
 import Generics.SOP qualified as SOP
 import Optics.Core (Prism', (%))
+import System.FilePath ((</>))
 import Text.Blaze.Html5 ((!))
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
@@ -60,11 +61,18 @@ data Model = Model
 emptyModel :: Model
 emptyModel = Model mempty
 
+staticDir :: FilePath
+staticDir = "static"
+
 instance EmaSite Route where
-  siteInput _ _ = pure $ pure emptyModel
-  siteOutput rp m = \case
+  siteInput _ _ = do
+    filesDyn <- staticFilesDynamic staticDir
+    pure $ Model <$> filesDyn
+  siteOutput rp _m = \case
     Route_Html r ->
       Ema.AssetGenerated Ema.Html $ renderHtmlRoute (rp % (_As @"Route_Html")) r
+    Route_Static (StaticRoute path) ->
+      Ema.AssetStatic $ staticDir </> path
 
 renderHtmlRoute :: Prism' FilePath HtmlRoute -> HtmlRoute -> LByteString
 renderHtmlRoute rp r = do
