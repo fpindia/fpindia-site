@@ -83,7 +83,7 @@ renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
     H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
-    H.img ! A.src (staticRouteUrl rp model "logo.svg") ! A.class_ "w-32"
+    H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32"
     case r of
       HtmlRoute_Index -> do
         "You are on the index page. "
