@@ -2,6 +2,8 @@
 
 WIP
 
+Install Nix, enable Flakes (see below) and then run `bin/run` to get the site up and running locally. See further below for static site generation.
+
 ## Getting Started
 
 To develop with full IDE support in Visual Studio Code, follow these steps:
