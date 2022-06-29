@@ -21,8 +21,7 @@ jobs:
           mkdir ./output
           export TARGET=$(pwd)/output
           nix develop -c tailwind-run -o static/tailwind.css 'src/**/*.hs' 
-          cd ./content
-          ../result/bin/fpindia-site gen $TARGET
+          ./result/bin/fpindia-site gen $TARGET
       - name: Deploy to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
