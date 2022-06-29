@@ -42,6 +42,7 @@
               tailwind;
           };
         };
+        apps.tailwind-run.program = "${inputs'.tailwind-haskell.packages.tailwind}/bin/tailwind-run";
       };
     };
 }
