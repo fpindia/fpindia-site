@@ -1,8 +1,6 @@
-# Ema Template
+# FPIndia Site
 
-This repository represents a simple example of [Ema](https://ema.srid.ca/) — it generates a basic site with a sidebar from a directory of Markdown files using Pandoc, Blaze HTML & TailwindCSS 3.x — and as such acts as a **template repository** to use for bootstrapping your next static site using Ema.
-
-The generated HTML site can be previewed here: https://srid.github.io/ema-template/
+WIP
 
 ## Getting Started
 
@@ -21,9 +19,6 @@ All but the final step need to be done only once. Check [the Ema tutorial](https
 
 - This project uses [relude](https://github.com/kowainik/relude) as its prelude, as well as Tailwind+Blaze as CSS utility and HTML DSL. Even though the author highly recommends them, you are of course free to swap them out for the library of your choice.
   - Tailwind CSS is compiled, alongside Ghcid, via foreman (see `./Procfile`)
-- As a first step to using this template, 
-  - change the project name in .cabal, flake.nix and hie.yaml files; then commit changes to Git.
-      - To automate this, `mv ema-template.cabal myproject.cabal; nix run nixpkgs#sd -- ema-template myproject * */* .github/*/*`
 - Configuration:
   - To change the port (or the Ema CLI arguments, used by `bin/run`), see `./.ghcid` (if you leave out `--port` a random port will be used)
   - To update Ema to the latest Git revision, run `nix flake lock --update-input ema` or just `nix flake update` (the latter updates all Nix inputs)
