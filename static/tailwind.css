@@ -671,10 +671,6 @@ select {
   }
 }
 
-.visible {
-  visibility: visible;
-}
-
 .static {
   position: static;
 }
@@ -690,10 +686,6 @@ select {
 
 .w-32 {
   width: 8rem;
-}
-
-.overflow-y-scroll {
-  overflow-y: scroll;
 }
 
 .p-2 {
