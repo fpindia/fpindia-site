@@ -95,7 +95,7 @@ renderBody rp model r = do
     routeElem r' w = do
       H.a ! A.class_ "text-red-500 hover:underline" ! routeHref (Route_Html r') $ w
     routeHref r' =
-      A.href (fromString . toString $ Ema.routeUrl rp r')
+      A.href (fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp r')
 
 renderHead :: Prism' FilePath Route -> Model -> H.Html
 renderHead rp model = do
