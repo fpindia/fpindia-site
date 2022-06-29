@@ -5,7 +5,7 @@ module Main where
 
 import Data.Generics.Sum.Any (AsAny (_As))
 import Data.SOP (I (I), NP (Nil, (:*)))
-import Data.Some
+import Data.Some (Some)
 import Data.Time (UTCTime)
 import Ema
 import Ema.CLI qualified
