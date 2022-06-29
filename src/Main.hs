@@ -10,11 +10,9 @@ import Data.Time (UTCTime)
 import Ema
 import Ema.CLI qualified
 import Ema.Route.Generic
-import FPIndia.StaticRoute (StaticRoute (StaticRoute))
 import FPIndia.StaticRoute qualified as SR
 import Generics.SOP qualified as SOP
 import Optics.Core (Prism', (%))
-import System.FilePath ((</>))
 import Text.Blaze.Html.Renderer.Utf8 qualified as RU
 import Text.Blaze.Html5 ((!))
 import Text.Blaze.Html5 qualified as H
@@ -22,14 +20,14 @@ import Text.Blaze.Html5.Attributes qualified as A
 
 data Route
   = Route_Html HtmlRoute
-  | Route_Static (StaticRoute UTCTime)
+  | Route_Static StaticRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
   deriving
     (HasSubRoutes)
     via ( Route
             `WithSubRoutes` '[ HtmlRoute
-                             , StaticRoute UTCTime
+                             , StaticRoute
                              ]
         )
   deriving (IsRoute) via (Route `WithModel` Model)
@@ -37,6 +35,8 @@ data Route
 instance HasSubModels Route where
   subModels m =
     I () :* I (modelFiles m) :* Nil
+
+type StaticRoute = SR.StaticRoute "static" UTCTime
 
 data HtmlRoute
   = HtmlRoute_Index
@@ -62,18 +62,15 @@ data Model = Model
   }
   deriving stock (Eq, Show)
 
-staticDir :: FilePath
-staticDir = "static"
-
 instance EmaSite Route where
-  siteInput cliAct _ = do
-    filesDyn <- SR.staticFilesDynamic staticDir
+  siteInput cliAct () = do
+    filesDyn <- siteInput @StaticRoute cliAct ()
     pure $ Model cliAct <$> filesDyn
   siteOutput rp m = \case
     Route_Html r ->
       Ema.AssetGenerated Ema.Html $ renderHtmlRoute rp m r
-    Route_Static (StaticRoute path) ->
-      Ema.AssetStatic $ staticDir </> path
+    Route_Static r ->
+      siteOutput (rp % (_As @"Route_Static")) (modelFiles m) r
 
 renderHtmlRoute :: Prism' FilePath Route -> Model -> HtmlRoute -> LByteString
 renderHtmlRoute rp m r = do

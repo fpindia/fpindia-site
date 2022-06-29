@@ -4,7 +4,12 @@
 {-# HLINT ignore "Use impureThrow" #-}
 
 -- | TODO: Upstream this to Ema.
-module FPIndia.StaticRoute where
+module FPIndia.StaticRoute (
+  StaticRoute,
+
+  -- * Helpers
+  staticRouteUrl,
+) where
 
 import Control.Exception (throw)
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
@@ -13,18 +18,20 @@ import Data.Some
 import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 import Ema
 import Ema.CLI qualified
+import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 import Optics.Core (Prism', prism')
+import System.FilePath ((</>))
 import System.UnionMount qualified as UnionMount
 import UnliftIO (MonadUnliftIO)
 
--- | Route to a static file under `./static`.
-newtype StaticRoute (a :: Type) = StaticRoute {unStaticRoute :: FilePath}
+-- | Route to a static file under @baseDir@.
+newtype StaticRoute (baseDir :: Symbol) (a :: Type) = StaticRoute {unStaticRoute :: FilePath}
   deriving newtype (Eq, Ord, Show)
 
 -- A route encoder is simply a Prism with (some) model as its context.
 -- `mkRouteEncoder` enables you to create route encoders "manually" this way.
-instance IsRoute (StaticRoute a) where
-  type RouteModel (StaticRoute a) = Map FilePath a
+instance IsRoute (StaticRoute baseDir a) where
+  type RouteModel (StaticRoute baseDir a) = Map FilePath a
   routeEncoder = mkRouteEncoder $ \files ->
     let enc =
           unStaticRoute
@@ -33,6 +40,12 @@ instance IsRoute (StaticRoute a) where
      in prism' enc dec
   allRoutes files =
     StaticRoute <$> Map.keys files
+
+instance KnownSymbol baseDir => EmaSite (StaticRoute baseDir UTCTime) where
+  siteInput _ _ = do
+    staticFilesDynamic $ symbolVal (Proxy @baseDir)
+  siteOutput _ _ (StaticRoute path) =
+    Ema.AssetStatic $ symbolVal (Proxy @baseDir) </> path
 
 staticFilesDynamic ::
   forall m.
@@ -57,12 +70,12 @@ staticFilesDynamic baseDir = do
         pure $ Map.delete fp
 
 -- | Like `Ema.routeUrl`, but looks up the value and appends it to URL in live-server (for force-reload in browser)
-staticRouteUrl :: forall r. (IsString r) => Some Ema.CLI.Action -> Prism' FilePath (StaticRoute UTCTime) -> Map FilePath UTCTime -> FilePath -> r
+staticRouteUrl :: forall r baseDir. (IsString r) => Some Ema.CLI.Action -> Prism' FilePath (StaticRoute baseDir UTCTime) -> Map FilePath UTCTime -> FilePath -> r
 staticRouteUrl cliAct rp model fp =
   case Map.lookup fp model of
     Just lastAccessed ->
       let tag :: String = formatTime defaultTimeLocale "%s" lastAccessed
-       in fromString . toString $ forceReload (toText tag) $ staticUrlTo rp fp
+       in fromString . toString $ forceReload (toText tag) $ Ema.routeUrl rp $ StaticRoute fp
     Nothing -> throw $ MissingStaticFile fp
   where
     -- Force the browser to reload the static file referenced
@@ -76,7 +89,3 @@ staticRouteUrl cliAct rp model fp =
 newtype MissingStaticFile = MissingStaticFile FilePath
   deriving stock (Eq, Show)
   deriving anyclass (Exception)
-
-staticUrlTo :: Prism' FilePath (StaticRoute a) -> FilePath -> Text
-staticUrlTo rp fp =
-  Ema.routeUrl rp $ StaticRoute fp
