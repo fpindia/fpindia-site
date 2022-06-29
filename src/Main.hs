@@ -1,32 +1,30 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE UndecidableInstances #-}
 
--- | This code generates a site based on Markdown files, rendering them using Pandoc.
--- You probably want to replace it with this simpler example:
---   https://github.com/srid/ema/blob/master/src/Ema/Example/Ex02_Basic.hs
+{- | This code generates a site based on Markdown files, rendering them using Pandoc.
+
+ You probably want to replace it with this simpler example:
+   https://github.com/srid/ema/blob/master/src/Ema/Example/Ex01_Basic.hs
+-}
 module Main where
 
 import Commonmark.Simple qualified as Commonmark
 import Control.Exception (throw)
-import Control.Monad.Logger
-import Data.Aeson (FromJSON)
+import Control.Monad.Logger (MonadLogger, MonadLoggerIO, logDebugNS)
 import Data.Default (Default (..))
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Data.Some (Some)
 import Data.Text qualified as T
 import Data.Tree (Tree (Node))
 import Data.Tree.Path qualified as PathTree
-import Data.UUID (UUID)
-import Data.UUID.V4 qualified as UUID
-import Ema (Ema (..))
-import Ema qualified
-import Ema.CLI qualified
 import NeatInterpolation (text)
 import Network.URI.Slug (Slug)
 import Network.URI.Slug qualified as Slug
-import Shower qualified
-import System.FilePath (splitExtension, splitPath)
+import Optics.Core (Prism', prism', (%))
+import System.FilePath (splitExtension, splitPath, (</>))
 import System.UnionMount qualified as UnionMount
 import Text.Blaze.Html.Renderer.Utf8 qualified as RU
 import Text.Blaze.Html5 ((!))
@@ -37,16 +35,42 @@ import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Walk qualified as W
 
+import Data.Generics.Sum.Any (AsAny (_As))
+import Data.SOP (I (..), NP (Nil, (:*)))
+import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
+import Ema
+import Ema.CLI qualified
+import Ema.Route.Encoder (htmlSuffixPrism)
+import Ema.Route.Generic
+import Generics.SOP qualified as SOP
+
+main :: IO ()
+main =
+  Ema.runSite_ @Route "./content"
+
 -- ------------------------
 -- Our site route
 -- ------------------------
 
+data Route
+  = Route_Markdown MarkdownRoute
+  | Route_Static (StaticRoute UTCTime)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
+  deriving
+    (HasSubRoutes)
+    via ( Route
+            `WithSubRoutes` '[ SlugListRoute
+                             , (StaticRoute UTCTime)
+                             ]
+        )
+  deriving (IsRoute) via (Route `WithModel` Model)
+
+instance HasSubModels Route where
+  subModels m =
+    I (Set.map coerce $ Map.keysSet $ modelDocs m) :* I (modelFiles m) :* Nil
+
 -- | Represents the relative path to a source (.md) file under some directory.
---
--- We will reuse this in our site route type to refer to the corresponding .html.
---
--- If you are using this repo as a template, you might want to use an ADT as
--- route (eg: data Route = Index | About)
 newtype MarkdownRoute = MarkdownRoute {unMarkdownRoute :: NonEmpty Slug}
   deriving stock (Eq, Ord, Show)
 
@@ -56,11 +80,12 @@ newtype BadRoute = BadRoute MarkdownRoute
 
 -- | Represents the top-level index.md
 indexMarkdownRoute :: MarkdownRoute
-indexMarkdownRoute = MarkdownRoute $ "index" :| []
+indexMarkdownRoute = MarkdownRoute $ one "index"
 
--- | Convert foo/bar.md to a @MarkdownRoute@
---
--- If the file is not a Markdown file, return Nothing.
+{- | Convert foo/bar.md to a @MarkdownRoute@
+
+ If the file is not a Markdown file, return Nothing.
+-}
 mkMarkdownRoute :: FilePath -> Maybe MarkdownRoute
 mkMarkdownRoute = \case
   (splitExtension -> (fp, ".md")) ->
@@ -80,195 +105,169 @@ markdownRouteFileBase :: MarkdownRoute -> Text
 markdownRouteFileBase =
   Slug.unSlug . head . NE.reverse . unMarkdownRoute
 
--- | For use in breadcrumbs
-markdownRouteInits :: MarkdownRoute -> NonEmpty MarkdownRoute
-markdownRouteInits (MarkdownRoute ("index" :| [])) =
-  one indexMarkdownRoute
-markdownRouteInits (MarkdownRoute (slug :| rest')) =
-  indexMarkdownRoute :| case nonEmpty rest' of
-    Nothing ->
-      one $ MarkdownRoute (one slug)
-    Just rest ->
-      MarkdownRoute (one slug) : go (one slug) rest
-  where
-    go :: NonEmpty Slug -> NonEmpty Slug -> [MarkdownRoute]
-    go x (y :| ys') =
-      let this = MarkdownRoute (x <> one y)
-       in case nonEmpty ys' of
-            Nothing ->
-              one this
-            Just ys ->
-              this : go (unMarkdownRoute this) ys
-
 -- ------------------------
 -- Our site model
 -- ------------------------
 
--- | This is our Ema "model" -- the app state used to generate our site.
---
--- It contains the list of all markdown files, parsed as Pandoc AST.
+{- | This is our Ema "model" -- the app state used to generate our site.
+
+  If your asset generating render function requires anything at all, it should
+  go in here.
+-}
 data Model = Model
-  { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
-    modelNav :: [Tree Slug],
-    -- | The ID is used to make the CSS url, so we are not caching stale
-    -- Tailwind
-    modelId :: UUID
+  { -- | Directory under which all content is kept.
+    modelBaseDir :: FilePath
+  , -- | Pandoc AST of all markdown files.
+    modelDocs :: Map MarkdownRoute Pandoc
+  , -- | Other files (to be served/ copied as-is)
+    modelFiles :: Map FilePath UTCTime
+  , -- | Sidebar tree
+    modelNav :: [Tree Slug]
+  , -- | Ema's CLI arguments stored in model, to later check if we are in live
+    -- server.
+    modelCliAction :: Some Ema.CLI.Action
   }
   deriving stock (Eq, Show)
 
-emptyModel :: IO Model
-emptyModel = Model mempty mempty <$> UUID.nextRandom
-
-data Meta = Meta
-  { -- | Indicates the order of the Markdown file in sidebar tree, relative to
-    -- its siblings.
-    order :: Maybe Int
-  }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (FromJSON)
-
-instance Default Meta where
-  def = Meta Nothing
+emptyModel :: FilePath -> Some Ema.CLI.Action -> Model
+emptyModel baseDir = Model baseDir mempty mempty mempty
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
-  fmap snd . modelLookup' k
-
-modelLookupMeta :: MarkdownRoute -> Model -> Meta
-modelLookupMeta k =
-  maybe def fst . modelLookup' k
-
-modelLookup' :: MarkdownRoute -> Model -> Maybe (Meta, Pandoc)
-modelLookup' k =
   Map.lookup k . modelDocs
 
 modelMember :: MarkdownRoute -> Model -> Bool
 modelMember k =
   Map.member k . modelDocs
 
-modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
+modelInsert :: MarkdownRoute -> Pandoc -> Model -> Model
 modelInsert k v model =
-  let modelDocs' = Map.insert k v (modelDocs model)
-   in model
-        { modelDocs = modelDocs',
-          modelNav =
-            PathTree.treeInsertPathMaintainingOrder
-              (\k' -> order $ maybe def fst $ Map.lookup (MarkdownRoute k') modelDocs')
-              (unMarkdownRoute k)
-              (modelNav model)
-        }
+  model
+    { modelDocs = Map.insert k v (modelDocs model)
+    , modelNav =
+        PathTree.treeInsertPath
+          (unMarkdownRoute k)
+          (modelNav model)
+    }
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
   model
-    { modelDocs = Map.delete k (modelDocs model),
-      modelNav = PathTree.treeDeletePath (unMarkdownRoute k) (modelNav model)
+    { modelDocs = Map.delete k (modelDocs model)
+    , modelNav = PathTree.treeDeletePath (unMarkdownRoute k) (modelNav model)
     }
 
--- | Once we have a "model" and "route" (as defined above), we should define the
--- @Ema@ typeclass to tell Ema how to decode/encode our routes, as well as the
--- list of routes to generate the static site with.
---
--- We use `Either` to represent either a static file route or a Markdown
--- generated route.
-instance Ema Model (Either FilePath MarkdownRoute) where
-  encodeRoute _model = \case
-    Left fp -> fp
-    Right (MarkdownRoute slugs) ->
-      toString $ T.intercalate "/" (Slug.unSlug <$> toList slugs) <> ".html"
+modelInsertStaticFile :: UTCTime -> FilePath -> Model -> Model
+modelInsertStaticFile lastAccessed fp model =
+  model {modelFiles = Map.insert fp lastAccessed (modelFiles model)}
 
-  decodeRoute _model fp = do
-    if "static/" `T.isPrefixOf` toText fp
-      then pure $ Left fp
-      else do
-        if null fp
-          then pure $ Right indexMarkdownRoute
-          else do
-            basePath <- T.stripSuffix ".html" (toText fp)
-            slugs <- nonEmpty $ fromString . toString <$> T.splitOn "/" basePath
-            pure $ Right $ MarkdownRoute slugs
+modelDeleteStaticFile :: FilePath -> Model -> Model
+modelDeleteStaticFile fp model =
+  model {modelFiles = Map.delete fp (modelFiles model)}
 
-  -- Routes to write when generating the static site.
-  allRoutes (Map.keys . modelDocs -> mdRoutes) =
-    [Left "static"]
-      <> fmap Right mdRoutes
+-- ------------------------
+-- Re-usable Route "library"
+-- ------------------------
+
+newtype StaticRoute (a :: Type) = StaticRoute {unStaticRoute :: FilePath}
+  deriving newtype (Eq, Ord, Show)
+
+-- A route encoder is simply a Prism with (some) model as its context.
+-- `mkRouteEncoder` enables you to create route encoders "manually" this way.
+instance IsRoute (StaticRoute a) where
+  type RouteModel (StaticRoute a) = Map FilePath a
+  routeEncoder = mkRouteEncoder $ \files ->
+    let enc =
+          unStaticRoute
+        dec fp =
+          StaticRoute fp <$ guard (Map.member fp files)
+     in prism' enc dec
+  allRoutes files =
+    StaticRoute <$> Map.keys files
+
+{- | Arbitrary routes represented by a non-empty list of @Slug@.
+
+  index.html corresponds to ["index"].
+-}
+newtype SlugListRoute = SlugListRoute (NonEmpty Slug)
+  deriving stock (Eq, Ord, Show)
+
+instance IsRoute SlugListRoute where
+  type RouteModel SlugListRoute = Set SlugListRoute
+  routeEncoder = mkRouteEncoder $ \rs ->
+    let enc (SlugListRoute slugs) =
+          toString $ T.intercalate "/" (Slug.unSlug <$> toList slugs)
+        dec fp = do
+          guard $ not $ null fp
+          slugs <- nonEmpty $ fromString . toString <$> T.splitOn "/" (toText fp)
+          let r = SlugListRoute slugs
+          guard $ Set.member r rs
+          pure r
+     in htmlSuffixPrism % prism' enc dec
+  allRoutes =
+    toList
 
 -- ------------------------
 -- Main entry point
 -- ------------------------
 
-log :: MonadLogger m => Text -> m ()
-log = logInfoNS "ema-template"
-
-logD :: MonadLogger m => Text -> m ()
-logD = logDebugNS "ema-template"
-
-main :: IO ()
-main =
-  -- runEma handles the CLI and starts the dev server (or generate static site
-  -- if `gen` argument is passed).  It is designed to work well with ghcid
-  -- (which is what the bin/run script uses).
-  void $
-    Ema.runEma render $ \_act model -> do
-      model0 <- liftIO emptyModel
-      -- This is the place where we can load and continue to modify our "model".
-      -- You will use `LVar.set` and `LVar.modify` to modify the model.
-      --
-      -- It is a run in a (long-running) thread of its own.
-      --
-      -- We use the FileSystem helper to directly "mount" our files on to the
-      -- LVar.
-      let pats = [((), "**/*.md")]
-          ignorePats = [".*"]
-      void . UnionMount.mountOnLVar "." pats ignorePats model model0 $ \() fp action -> do
-        case action of
-          UnionMount.Refresh _ () -> do
+instance EmaSite Route where
+  type SiteArg Route = FilePath -- Content directory
+  siteInput cliAct contentDir = do
+    -- This function should return an Ema `Dynamic`, which is merely a tuple of
+    -- the initial model value, and an updating function. The `unionmount`
+    -- library returns this tuple, which we use to create the `Dynamic`.
+    let pats = [(Md, "**/*.md"), (StaticFile, "**/*")]
+        ignorePats = [".*"]
+        model0 = emptyModel contentDir cliAct
+    Dynamic
+      <$> UnionMount.mount contentDir pats ignorePats model0 handleUpdate
+    where
+      -- Take the file that got changed and update our in-memory `Model` accordingly.
+      handleUpdate :: (MonadIO m, MonadLogger m, MonadLoggerIO m) => FileType -> FilePath -> UnionMount.FileAction () -> m (Model -> Model)
+      handleUpdate = \case
+        Md -> \fp -> \case
+          UnionMount.Refresh _ _ -> do
             mData <- readSource fp
             pure $ maybe id (uncurry modelInsert) mData
           UnionMount.Delete ->
             pure $ maybe id modelDelete $ mkMarkdownRoute fp
-  where
-    readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
-    readSource fp =
-      runMaybeT $ do
+        StaticFile -> \fp -> \case
+          UnionMount.Refresh _ _ -> do
+            now <- liftIO getCurrentTime
+            pure $ modelInsertStaticFile now fp
+          UnionMount.Delete -> do
+            pure $ modelDeleteStaticFile fp
+      readSource :: (MonadIO m, MonadLogger m, MonadLoggerIO m) => FilePath -> m (Maybe (MarkdownRoute, Pandoc))
+      readSource fp = runMaybeT $ do
         r :: MarkdownRoute <- MaybeT $ pure $ mkMarkdownRoute fp
         logD $ "Reading " <> toText fp
-        s <- readFileText fp
-        pure
-          ( r,
-            either (throw . BadMarkdown) (first $ fromMaybe def) $
-              Commonmark.parseMarkdownWithFrontMatter @Meta Commonmark.fullMarkdownSpec fp s
-          )
+        s <- readFileText $ contentDir </> fp
+        case Commonmark.parseMarkdownWithFrontMatter @(Map Text Text) Commonmark.fullMarkdownSpec fp s of
+          Left err -> Ema.CLI.crash "ema-template" err
+          Right (_mMeta, doc) -> pure (r, doc)
+  siteOutput rp model = \case
+    Route_Markdown r ->
+      Ema.AssetGenerated Ema.Html $ renderHtml rp model r
+    Route_Static (StaticRoute path) ->
+      Ema.AssetStatic $ modelBaseDir model </> path
 
-newtype BadMarkdown = BadMarkdown Text
-  deriving stock (Show)
-  deriving anyclass (Exception)
+data FileType = Md | StaticFile deriving stock (Show, Eq, Ord)
+
+logD :: MonadLogger m => Text -> m ()
+logD = logDebugNS "ema-template"
 
 -- ------------------------
 -- Our site HTML
 -- ------------------------
 
-render :: Some Ema.CLI.Action -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
-render act model = \case
-  Left fp ->
-    -- This instructs ema to treat this route "as is" (ie. a static file; no generation)
-    -- The argument `fp` refers to the absolute path to the static file.
-    Ema.AssetStatic fp
-  Right r ->
-    -- Generate a Html route; hot-reload is enabled.
-    Ema.AssetGenerated Ema.Html $ renderHtml act model r
-
-renderHtml :: Some Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
-renderHtml emaAction model r = do
-  case modelLookup' r model of
-    Nothing ->
-      -- In dev server mode, Ema will display the exceptions in the browser.
-      -- In static generation mode, they will cause the generation to crash.
-      throw $ BadRoute r
-    Just (meta, doc) -> do
-      -- You can return your own HTML string here, but we use the Tailwind+Blaze helper
-      layoutWith "en" "UTF-8" (headHtml emaAction model r doc) $
-        bodyHtml model r meta doc
+renderHtml :: Prism' FilePath Route -> Model -> MarkdownRoute -> LByteString
+renderHtml rp model r = do
+  -- In dev server mode, Ema will display the exceptions in the browser.
+  -- In static generation mode, they will cause the generation to crash.
+  let doc = fromMaybe (throw $ BadRoute r) $ modelLookup r model
+  layoutWith "en" "UTF-8" (headHtml rp model r doc) $
+    bodyHtml rp model r doc
   where
     -- A general HTML layout
     layoutWith :: H.AttributeValue -> H.AttributeValue -> H.Html -> H.Html -> LByteString
@@ -282,17 +281,9 @@ renderHtml emaAction model r = do
           appHead
         appBody
 
-tailwindCssUrl :: (Semigroup a, IsString a) => Some Ema.CLI.Action -> Model -> a
-tailwindCssUrl emaAction model =
-  "static/tailwind.css"
-    <> if Ema.CLI.isLiveServer emaAction
-      then -- Force the browser to reload the CSS
-        "?" <> show (modelId model)
-      else ""
-
-headHtml :: Some Ema.CLI.Action -> Model -> MarkdownRoute -> Pandoc -> H.Html
-headHtml emaAction model r doc = do
-  if Ema.CLI.isLiveServer emaAction
+headHtml :: Prism' FilePath Route -> Model -> MarkdownRoute -> Pandoc -> H.Html
+headHtml rp model r doc = do
+  if Ema.CLI.isLiveServer (modelCliAction model)
     then H.base ! A.href "/"
     else -- Since our URLs are all relative, and GitHub Pages uses a non-root base
     -- URL, we should specify it explicitly. Note that this is not necessary if
@@ -304,61 +295,22 @@ headHtml emaAction model r doc = do
         then "Ema – next-gen Haskell static site generator"
         else lookupTitle doc r <> " – Ema"
   H.meta ! A.name "description" ! A.content "Ema static site generator (Jamstack) in Haskell"
-  favIcon
-  H.link ! A.rel "stylesheet" ! A.href (tailwindCssUrl emaAction model)
-  -- Make this a PWA and w/ https://web.dev/themed-omnibox/
-  H.link ! A.rel "manifest" ! A.href "manifest.json"
-  H.meta ! A.name "theme-color" ! A.content "#DB2777"
-  unless (r == indexMarkdownRoute) prismJs
-  where
-    prismJs = do
-      H.unsafeByteString . encodeUtf8 $
-        [text|
-        <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-        |]
-    favIcon = do
-      H.unsafeByteString . encodeUtf8 $
-        [text|
-        <link href="static/logo.svg" rel="icon" />
-        |]
+  H.link ! A.href (staticUrlTo rp "logo.svg") ! A.rel "icon"
+  H.link ! A.rel "stylesheet" ! A.href (H.toValue $ tailwindCssUrl rp model)
 
-data ContainerType
-  = -- | The row representing title part of the site
-    CHeader
-  | -- | The row representing the main part of the site. Sidebar lives here, as well as <main>
-    CBody
-  deriving stock (Eq, Show)
-
-containerLayout :: ContainerType -> H.Html -> H.Html -> H.Html
-containerLayout ctype sidebar w = do
-  H.div ! A.class_ "px-2 grid grid-cols-12" $ do
-    let sidebarCls = case ctype of
-          CHeader -> ""
-          CBody -> "md:sticky md:top-0 md:h-screen overflow-x-auto"
-    H.div ! A.class_ ("hidden md:mr-4 md:block md:col-span-3 " <> sidebarCls) $ do
-      sidebar
-    H.div ! A.class_ "col-span-12 md:col-span-9" $ do
-      w
-
-mdUrl :: Ema model (Either FilePath r) => model -> r -> Text
-mdUrl model r =
-  Ema.routeUrl model $ Right @FilePath r
-
-bodyHtml :: Model -> MarkdownRoute -> Meta -> Pandoc -> H.Html
-bodyHtml model r meta doc = do
+bodyHtml :: Prism' FilePath Route -> Model -> MarkdownRoute -> Pandoc -> H.Html
+bodyHtml rp model r doc = do
   H.div ! A.class_ "container mx-auto xl:max-w-screen-lg" $ do
     -- Header row
     let sidebarLogo =
           H.div ! A.class_ "mt-2 h-full flex pl-2 space-x-2 items-end" $ do
-            H.a ! A.href (H.toValue $ mdUrl model indexMarkdownRoute) $
-              H.img ! A.class_ "z-50 transition transform hover:scale-125 hover:opacity-80 h-20" ! A.src "static/logo.svg"
-    containerLayout CHeader sidebarLogo $ do
+            H.a ! A.href (H.toValue $ Ema.routeUrl rp $ Route_Markdown indexMarkdownRoute) $
+              H.img ! A.class_ "z-50 transition transform hover:scale-125 hover:opacity-80 h-20" ! A.src (staticUrlTo rp "logo.svg")
+    containerLayout "" sidebarLogo $ do
       H.div ! A.class_ "flex justify-center items-center" $ do
         H.h1 ! A.class_ "text-6xl mt-2 mb-2 text-center pb-2" $ H.text $ lookupTitle doc r
     -- Main row
-    containerLayout CBody (H.div ! A.class_ "bg-indigo-100 shadow-lg shadow-indigo-300/50 pt-1 pb-2" $ renderSidebarNav model r) $ do
-      renderBreadcrumbs model r
+    containerLayout "md:sticky md:top-0 md:h-screen overflow-x-auto" (H.div ! A.class_ "bg-indigo-100 shadow-lg shadow-indigo-300/50 pt-1 pb-2" $ sidebarHtml rp model r) $ do
       renderPandoc $
         doc
           & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
@@ -369,12 +321,9 @@ bodyHtml model r meta doc = do
                 target <- mkMarkdownRoute $ toString url
                 -- Check that .md links are not broken
                 if modelMember target model
-                  then pure $ mdUrl model target
+                  then pure $ Ema.routeUrl rp $ Route_Markdown target
                   else throw $ BadRoute target
             )
-      H.div ! A.class_ "text-xs text-gray-400 mt-4" $ do
-        -- Just for debuggging
-        H.toHtml $ Shower.shower meta
       H.footer ! A.class_ "flex justify-center items-center space-x-4 my-8 text-center text-gray-500" $ do
         let editUrl = fromString $ "https://github.com/srid/ema-template/edit/master/content/" <> markdownRouteSourcePath r
         H.a ! A.href editUrl ! A.title "Edit this page on GitHub" $ editIcon
@@ -382,6 +331,13 @@ bodyHtml model r meta doc = do
           "Powered by "
           H.a ! A.class_ "font-bold" ! A.href "https://github.com/srid/ema" $ "Ema"
   where
+    containerLayout :: H.AttributeValue -> H.Html -> H.Html -> H.Html
+    containerLayout sidebarCls sidebar w = do
+      H.div ! A.class_ "px-2 grid grid-cols-12" $ do
+        H.div ! A.class_ ("hidden md:mr-4 md:block md:col-span-3 " <> sidebarCls) $ do
+          sidebar
+        H.div ! A.class_ "col-span-12 md:col-span-9" $ do
+          w
     editIcon =
       H.unsafeByteString $
         encodeUtf8
@@ -392,8 +348,8 @@ bodyHtml model r meta doc = do
           </svg>
           |]
 
-renderSidebarNav :: Model -> MarkdownRoute -> H.Html
-renderSidebarNav model currentRoute = do
+sidebarHtml :: Prism' FilePath Route -> Model -> MarkdownRoute -> H.Html
+sidebarHtml rp model currentRoute = do
   -- Drop toplevel index.md from sidebar tree (because we are linking to it manually)
   let navTree = PathTree.treeDeleteChild "index" $ modelNav model
   go [] navTree
@@ -406,33 +362,42 @@ renderSidebarNav model currentRoute = do
           go ([slug] <> parSlugs) children
     renderRoute c r = do
       let linkCls = if r == currentRoute then "text-yellow-600 font-bold" else ""
-      H.div ! A.class_ ("my-2 " <> c) $ H.a ! A.class_ (" hover:text-black  " <> linkCls) ! A.href (H.toValue $ mdUrl model r) $ H.toHtml $ lookupTitleForgiving model r
+      H.div ! A.class_ ("my-2 " <> c) $ do
+        H.a
+          ! A.class_ (" hover:text-black  " <> linkCls)
+          ! A.href (H.toValue $ Ema.routeUrl rp $ Route_Markdown r)
+          $ H.toHtml $ lookupTitleForgiving model r
 
-renderBreadcrumbs :: Model -> MarkdownRoute -> H.Html
-renderBreadcrumbs model r = do
-  whenNotNull (init $ markdownRouteInits r) $ \(toList -> crumbs) ->
-    H.div ! A.class_ "w-full text-gray-600 mt-4 block md:hidden" $ do
-      H.div ! A.class_ "flex justify-center" $ do
-        H.div ! A.class_ "w-full bg-white py-2 rounded" $ do
-          H.ul ! A.class_ "flex text-gray-500 text-sm lg:text-base" $ do
-            forM_ crumbs $ \crumb ->
-              H.li ! A.class_ "inline-flex items-center" $ do
-                H.a ! A.class_ "px-1 font-bold bg-yellow-500 text-gray-50 rounded"
-                  ! A.href (fromString . toString $ mdUrl model crumb)
-                  $ H.text $ lookupTitleForgiving model crumb
-                rightArrow
-            H.li ! A.class_ "inline-flex items-center text-gray-600" $ do
-              H.a $ H.text $ lookupTitleForgiving model r
+data NoTailwind = NoTailwind
+  deriving stock (Show, Eq)
+  deriving anyclass (Exception)
+
+tailwindCssUrl :: Prism' FilePath Route -> Model -> H.AttributeValue
+tailwindCssUrl rp model =
+  case Map.lookup "tailwind.css" (modelFiles model) of
+    Just lastAccessed ->
+      let tag = H.toValue $ formatTime defaultTimeLocale "%s" lastAccessed
+       in forceReload tag $ staticUrlTo rp "tailwind.css"
+    Nothing -> throw NoTailwind
   where
-    rightArrow =
-      H.unsafeByteString $
-        encodeUtf8
-          [text|
-          <svg fill="currentColor" viewBox="0 0 20 20" class="w-auto h-5 text-gray-400"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          |]
+    -- Force the browser to reload the CSS
+    forceReload tag url =
+      url
+        <> if Ema.CLI.isLiveServer (modelCliAction model)
+          then "?" <> tag
+          else -- TODO: Need a way to invalidate browser cache for statically generated site
+            ""
 
--- | This accepts if "${folder}.md" doesn't exist, and returns "folder" as the
--- title.
+staticUrlTo :: Prism' FilePath Route -> FilePath -> H.AttributeValue
+staticUrlTo rp fp =
+  H.toValue $ Ema.routeUrl rpStatic $ StaticRoute fp
+  where
+    rpStatic :: Prism' FilePath (StaticRoute UTCTime)
+    rpStatic = rp % (_As @"Route_Static")
+
+{- | This accepts if "${folder}.md" doesn't exist, and returns "folder" as the
+ title.
+-}
 lookupTitleForgiving :: Model -> MarkdownRoute -> Text
 lookupTitleForgiving model r =
   fromMaybe (markdownRouteFileBase r) $ do
@@ -443,17 +408,6 @@ lookupTitleForgiving model r =
 lookupTitle :: Pandoc -> MarkdownRoute -> Text
 lookupTitle doc r =
   maybe (Slug.unSlug $ last $ unMarkdownRoute r) plainify $ getPandocH1 doc
-
--- ------------------------
--- Pandoc transformer
--- ------------------------
-
-rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
-rewriteLinks f =
-  W.walk $ \case
-    B.Link attr is (url, title) ->
-      B.Link attr is (f url, title)
-    x -> x
 
 -- ------------------------
 -- Pandoc renderer
@@ -474,11 +428,11 @@ renderPandoc doc = do
     exts =
       mconcat
         [ Pandoc.extensionsFromList
-            [ Pandoc.Ext_fenced_code_attributes,
-              Pandoc.Ext_auto_identifiers,
-              Pandoc.Ext_smart
-            ],
-          Pandoc.githubMarkdownExtensions
+            [ Pandoc.Ext_fenced_code_attributes
+            , Pandoc.Ext_auto_identifiers
+            , Pandoc.Ext_smart
+            ]
+        , Pandoc.githubMarkdownExtensions
         ]
 
 -- ------------------------
@@ -486,20 +440,20 @@ renderPandoc doc = do
 -- ------------------------
 
 getPandocH1 :: Pandoc -> Maybe [B.Inline]
-getPandocH1 = listToMaybe . W.query go
-  where
-    go :: B.Block -> [[B.Inline]]
-    go = \case
-      B.Header 1 _ inlines ->
-        [inlines]
-      _ ->
-        []
+getPandocH1 doc = listToMaybe . flip W.query doc $ \case
+  B.Header 1 _ inlines -> [inlines]
+  _ -> []
 
 withoutH1 :: Pandoc -> Pandoc
 withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
   Pandoc meta rest
 withoutH1 doc =
   doc
+
+rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
+rewriteLinks f = W.walk $ \case
+  B.Link attr is (url, title) -> B.Link attr is (f url, title)
+  x -> x
 
 -- | Convert Pandoc AST inlines to raw text.
 plainify :: [B.Inline] -> Text
