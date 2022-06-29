@@ -10,7 +10,8 @@ import Data.Time (UTCTime)
 import Ema
 import Ema.CLI qualified
 import Ema.Route.Generic
-import FPIndia.StaticRoute (StaticRoute (StaticRoute), staticFilesDynamic, staticRouteUrl)
+import FPIndia.StaticRoute (StaticRoute (StaticRoute))
+import FPIndia.StaticRoute qualified as SR
 import Generics.SOP qualified as SOP
 import Optics.Core (Prism', (%))
 import System.FilePath ((</>))
@@ -66,7 +67,7 @@ staticDir = "static"
 
 instance EmaSite Route where
   siteInput cliAct _ = do
-    filesDyn <- staticFilesDynamic staticDir
+    filesDyn <- SR.staticFilesDynamic staticDir
     pure $ Model cliAct <$> filesDyn
   siteOutput rp m = \case
     Route_Html r ->
@@ -106,7 +107,11 @@ renderHead rp model = do
   H.title "FPIndia"
   H.base ! A.href "/"
   -- H.link ! A.href (staticUrlTo rp "logo.svg") ! A.rel "icon"
-  H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl (modelCliAction model) (rp % (_As @"Route_Static")) (modelFiles model) "tailwind.css")
+  H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl rp model "tailwind.css")
+
+staticRouteUrl :: IsString r => Prism' FilePath Route -> Model -> FilePath -> r
+staticRouteUrl rp m =
+  SR.staticRouteUrl (modelCliAction m) (rp % (_As @"Route_Static")) (modelFiles m)
 
 main :: IO ()
 main = void $ Ema.runSite @Route ()
