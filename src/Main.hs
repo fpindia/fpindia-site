@@ -83,9 +83,10 @@ renderHtmlRoute rp m r = do
     renderBody rp m r
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
-renderBody rp _m r = do
+renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
     H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
+    H.img ! A.src (staticRouteUrl rp model "logo.svg") ! A.class_ "w-32"
     case r of
       HtmlRoute_Index -> do
         "You are on the index page. "
@@ -106,9 +107,9 @@ renderHead rp model = do
   H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1"
   H.title "FPIndia"
   H.base ! A.href "/"
-  -- H.link ! A.href (staticUrlTo rp "logo.svg") ! A.rel "icon"
   H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl rp model "tailwind.css")
 
+-- | Link to a file under ./static
 staticRouteUrl :: IsString r => Prism' FilePath Route -> Model -> FilePath -> r
 staticRouteUrl rp m =
   SR.staticRouteUrl (modelCliAction m) (rp % (_As @"Route_Static")) (modelFiles m)

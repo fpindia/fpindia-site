@@ -688,6 +688,10 @@ select {
   margin-top: 2rem;
 }
 
+.w-32 {
+  width: 8rem;
+}
+
 .overflow-y-scroll {
   overflow-y: scroll;
 }
