@@ -13,6 +13,7 @@ module FPIndia.StaticRoute (
 
 import Control.Exception (throw)
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
+import Data.List qualified as List
 import Data.Map.Strict qualified as Map
 import Data.Some
 import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
@@ -20,7 +21,7 @@ import Ema
 import Ema.CLI qualified
 import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
 import Optics.Core (Prism', prism')
-import System.FilePath ((</>))
+import System.FilePath (takeExtension, (</>))
 import System.UnionMount qualified as UnionMount
 import UnliftIO (MonadUnliftIO)
 
@@ -70,21 +71,29 @@ staticFilesDynamic baseDir = do
         pure $ Map.delete fp
 
 -- | Like `Ema.routeUrl`, but looks up the value and appends it to URL in live-server (for force-reload in browser)
-staticRouteUrl :: forall r baseDir. (IsString r) => Some Ema.CLI.Action -> Prism' FilePath (StaticRoute baseDir UTCTime) -> Map FilePath UTCTime -> FilePath -> r
+staticRouteUrl ::
+  forall a baseDir staticRoute.
+  (IsString a, staticRoute ~ StaticRoute baseDir UTCTime) =>
+  Some Ema.CLI.Action ->
+  Prism' FilePath staticRoute ->
+  RouteModel staticRoute ->
+  FilePath ->
+  a
 staticRouteUrl cliAct rp model fp =
   case Map.lookup fp model of
     Just lastAccessed ->
-      let tag :: String = formatTime defaultTimeLocale "%s" lastAccessed
-       in fromString . toString $ forceReload (toText tag) $ Ema.routeUrl rp $ StaticRoute fp
+      let tag = toText $ formatTime defaultTimeLocale "%s" lastAccessed
+          url = Ema.routeUrl rp (StaticRoute fp)
+       in fromString . toString $ url <> refreshAddendum tag
     Nothing -> throw $ MissingStaticFile fp
   where
     -- Force the browser to reload the static file referenced
-    forceReload tag url =
-      url
-        <> if Ema.CLI.isLiveServer cliAct
-          then "?" <> tag
-          else -- TODO: Need a way to invalidate browser cache for statically generated site
-            ""
+    refreshAddendum tag =
+      fromMaybe "" $ do
+        -- In live server, force reload all (re-added/modified) static files.
+        -- In statically generated site, do it only for CSS and JS files.
+        guard $ Ema.CLI.isLiveServer cliAct || takeExtension fp `List.elem` [".css", ".js"]
+        pure $ "?" <> tag
 
 newtype MissingStaticFile = MissingStaticFile FilePath
   deriving stock (Eq, Show)
