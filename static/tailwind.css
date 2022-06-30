@@ -688,6 +688,10 @@ select {
   width: 8rem;
 }
 
+.w-36 {
+  width: 9rem;
+}
+
 .p-2 {
   padding: 0.5rem;
 }
