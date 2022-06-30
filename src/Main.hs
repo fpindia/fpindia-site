@@ -10,7 +10,7 @@ import Data.Time (UTCTime)
 import Ema
 import Ema.CLI qualified
 import Ema.Route.Generic
-import FPIndia.StaticRoute qualified as SR
+import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import Generics.SOP qualified as SOP
 import Optics.Core (Prism', (%))
 import Text.Blaze.Html.Renderer.Utf8 qualified as RU
