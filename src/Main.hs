@@ -115,4 +115,4 @@ staticRouteUrl rp m =
   SR.staticRouteUrl (modelCliAction m) (rp % (_As @"Route_Static")) (modelFiles m)
 
 main :: IO ()
-main = void $ Ema.runSite @Route ()
+main = Ema.runSite_ @Route ()

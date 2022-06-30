@@ -27,31 +27,22 @@ executable fpindia-site
     , base
     , blaze-html
     , blaze-markup
-    , commonmark-simple
     , containers
     , data-default
-    , dependent-sum
     , directory
     , ema                 >=0.7
     , filepath
     , generic-optics
     , generics-sop
     , monad-logger
-    , neat-interpolation
     , optics-core
-    , pandoc
-    , pandoc-types
-    , path-tree           >=0.2
     , relude
-    , shower
     , some
     , sop-core
-    , tagged
     , text
     , time
     , unionmount          >=0.2
     , unliftio
-    , url-slug
 
   mixins:
     base hiding (Prelude),
