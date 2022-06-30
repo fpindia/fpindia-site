@@ -15,7 +15,7 @@ import Control.Exception (throw)
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
 import Data.List qualified as List
 import Data.Map.Strict qualified as Map
-import Data.Some
+import Data.Some (Some)
 import Data.Time (UTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 import Ema
 import Ema.CLI qualified
@@ -33,7 +33,7 @@ newtype StaticRoute (baseDir :: Symbol) (a :: Type) = StaticRoute {unStaticRoute
 -- `mkRouteEncoder` enables you to create route encoders "manually" this way.
 instance IsRoute (StaticRoute baseDir a) where
   type RouteModel (StaticRoute baseDir a) = Map FilePath a
-  routeEncoder = mkRouteEncoder $ \files ->
+  routeEncoder = Ema.mkRouteEncoder $ \files ->
     let enc =
           unStaticRoute
         dec fp =

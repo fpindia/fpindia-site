@@ -76,14 +76,17 @@ renderHtmlRoute :: Prism' FilePath Route -> Model -> HtmlRoute -> LByteString
 renderHtmlRoute rp m r = do
   RU.renderHtml $ do
     H.docType
-    renderHead rp m
-    renderBody rp m r
+    H.html ! A.lang "en" $ do
+      H.head $ do
+        renderHead rp m
+      H.body $ do
+        renderBody rp m r
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
     H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
-    H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32"
+    H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
         "You are on the index page. "
