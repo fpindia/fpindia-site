@@ -4,7 +4,6 @@
 module Main where
 
 import Data.Generics.Sum.Any (AsAny (_As))
-import Data.SOP (I (I), NP (Nil, (:*)))
 import Data.Some (Some)
 import Data.Time (UTCTime)
 import Ema
@@ -23,28 +22,16 @@ data Route
   | Route_Static StaticRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
-  deriving
-    (HasSubRoutes)
-    via ( Route
-            `WithSubRoutes` '[ HtmlRoute
-                             , StaticRoute
-                             ]
-        )
-  deriving (IsRoute) via (Route `WithModel` Model)
-
-instance HasSubModels Route where
-  subModels m =
-    I () :* I (modelFiles m) :* Nil
+  deriving (HasSubRoutes) via (Route `WithSubRoutes` '[HtmlRoute, StaticRoute])
+  deriving (HasSubModels, IsRoute) via (Route `WithModel` Model)
 
 type StaticRoute = SR.StaticRoute "static" UTCTime
 
 data HtmlRoute
   = HtmlRoute_Index
   | HtmlRoute_About
-  deriving stock
-    (Show, Eq, Ord, Generic)
-  deriving anyclass
-    (SOP.Generic, SOP.HasDatatypeInfo)
+  deriving stock (Show, Eq, Ord, Generic)
+  deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
   deriving
     (HasSubRoutes)
     via ( HtmlRoute
@@ -52,15 +39,13 @@ data HtmlRoute
                             , FileRoute "about.html"
                             ]
         )
-  deriving
-    (HasSubModels, IsRoute)
-    via (HtmlRoute `WithModel` ())
+  deriving (HasSubModels, IsRoute) via (HtmlRoute `WithModel` ())
 
 data Model = Model
   { modelCliAction :: Some Ema.CLI.Action
   , modelFiles :: Map FilePath UTCTime
   }
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Show, Generic)
 
 instance EmaSite Route where
   siteInput cliAct () = do
