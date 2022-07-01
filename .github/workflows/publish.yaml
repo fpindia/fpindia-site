@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+  pull_request:
 jobs:
   static-site:
     runs-on: ubuntu-latest
@@ -13,10 +14,11 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - name: Build sources 🔧
+      - name: Build 🔧
         run: |
           nix build -j 4
       - name: Generate HTML 🔧
+        if: github.ref == 'refs/heads/master'
         run: |
           mkdir ./output
           export TARGET=$(pwd)/output
@@ -24,6 +26,7 @@ jobs:
           nix run .#tailwind-run -- -o static/tailwind.css 'src/**/*.hs'
           ./result/bin/fpindia-site gen $TARGET
       - name: Deploy to gh-pages 🚀
+        if: github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
