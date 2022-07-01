@@ -13,7 +13,6 @@ import Ema.Route.Generic
 import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import Generics.SOP qualified as SOP
 import Optics.Core (Prism', (%))
-import Text.Blaze.Html (toHtml)
 import Text.Blaze.Html.Renderer.Utf8 qualified as RU
 import Text.Blaze.Html5 ((!))
 import Text.Blaze.Html5 qualified as H
