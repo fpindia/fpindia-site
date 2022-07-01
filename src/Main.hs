@@ -55,10 +55,10 @@ data HtmlRoute
     via ( HtmlRoute
             `WithSubRoutes` [ FileRoute "index.html"
                             , FileRoute "about.html"
-                            , FileRoute "upcomingevents.html"
-                            , FileRoute "pastevents.html"
-                            , FileRoute "connectwithus.html"
-                            , FileRoute "fpjobsinindia.html"
+                            , FileRoute "upcoming.html"
+                            , FileRoute "past.html"
+                            , FileRoute "connect.html"
+                            , FileRoute "jobs.html"
                             , FileRoute "resources.html"
                             ]
         )
