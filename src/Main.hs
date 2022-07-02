@@ -73,7 +73,7 @@ renderHtmlRoute rp m r = do
     H.docType
     H.html ! A.lang "en" $ do
       H.head $ do
-        renderHead rp m
+        renderHead rp m r
       H.body $ do
         renderBody rp m r
 
@@ -107,12 +107,26 @@ renderBody rp model r = do
       HtmlRoute_Resources -> do
         "you are on the resources page."
 
-renderHead :: Prism' FilePath Route -> Model -> H.Html
-renderHead rp model = do
+renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
+renderHead rp model r = do
   H.meta ! A.charset "UTF-8"
   -- This makes the site mobile friendly by default.
   H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1"
-  H.title "FPIndia"
+  case r of
+      HtmlRoute_Index -> do
+        H.title "Welcome"
+      HtmlRoute_About -> do
+        H.title "About"
+      HtmlRoute_UpcomingEvents -> do
+        H.title "Upcoming Events"
+      HtmlRoute_PastEvents -> do
+        H.title "Past Events"
+      HtmlRoute_ConnectWithUs -> do
+        H.title "Connect With Us"
+      HtmlRoute_FpJobsInIndia -> do
+        H.title "Fp Jobs In India"
+      HtmlRoute_Resources -> do
+        H.title "Resources"
   H.base ! A.href "/"
   H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl rp model "tailwind.css")
 
