@@ -22,8 +22,14 @@ data Route
   | Route_Static StaticRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
-  deriving (HasSubRoutes) via (Route `WithSubRoutes` '[HtmlRoute, StaticRoute])
-  deriving (HasSubModels, IsRoute) via (Route `WithModel` Model)
+  deriving
+    (HasSubRoutes, HasSubModels, IsRoute)
+    via ( GenericRoute
+            Route
+            '[ WithModel Model
+             , WithSubRoutes '[HtmlRoute, StaticRoute]
+             ]
+        )
 
 type StaticRoute = SR.StaticRoute "static" UTCTime
 
@@ -38,18 +44,20 @@ data HtmlRoute
   deriving stock (Show, Eq, Ord, Generic)
   deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
   deriving
-    (HasSubRoutes)
-    via ( HtmlRoute
-            `WithSubRoutes` [ FileRoute "index.html"
-                            , FileRoute "about.html"
-                            , FileRoute "upcoming.html"
-                            , FileRoute "past.html"
-                            , FileRoute "connect.html"
-                            , FileRoute "jobs.html"
-                            , FileRoute "resources.html"
-                            ]
+    (HasSubRoutes, HasSubModels, IsRoute)
+    via ( GenericRoute
+            HtmlRoute
+            '[ WithSubRoutes
+                '[ FileRoute "index.html"
+                 , FileRoute "about.html"
+                 , FileRoute "upcoming.html"
+                 , FileRoute "past.html"
+                 , FileRoute "connect.html"
+                 , FileRoute "jobs.html"
+                 , FileRoute "resources.html"
+                 ]
+             ]
         )
-  deriving (HasSubModels, IsRoute) via (HtmlRoute `WithModel` ())
 
 data Model = Model
   { modelCliAction :: Some Ema.CLI.Action
