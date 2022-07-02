@@ -37,7 +37,6 @@ executable fpindia-site
     , monad-logger
     , optics-core
     , relude
-    , some
     , sop-core
     , text
     , time

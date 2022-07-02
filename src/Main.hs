@@ -4,10 +4,7 @@
 module Main where
 
 import Data.Generics.Sum.Any (AsAny (_As))
-import Data.Some (Some)
-import Data.Time (UTCTime)
 import Ema
-import Ema.CLI qualified
 import Ema.Route.Generic
 import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import Generics.SOP qualified as SOP
@@ -31,7 +28,7 @@ data Route
              ]
         )
 
-type StaticRoute = SR.StaticRoute "static" UTCTime
+type StaticRoute = SR.StaticRoute "static"
 
 data HtmlRoute
   = HtmlRoute_Index
@@ -60,20 +57,19 @@ data HtmlRoute
         )
 
 data Model = Model
-  { modelCliAction :: Some Ema.CLI.Action
-  , modelFiles :: Map FilePath UTCTime
+  { modelStatic :: SR.Model
   }
   deriving stock (Eq, Show, Generic)
 
 instance EmaSite Route where
   siteInput cliAct () = do
-    filesDyn <- siteInput @StaticRoute cliAct ()
-    pure $ Model cliAct <$> filesDyn
+    staticRouteDyn <- siteInput @StaticRoute cliAct ()
+    pure $ Model <$> staticRouteDyn
   siteOutput rp m = \case
     Route_Html r ->
       Ema.AssetGenerated Ema.Html $ renderHtmlRoute rp m r
     Route_Static r ->
-      siteOutput (rp % (_As @"Route_Static")) (modelFiles m) r
+      siteOutput (rp % (_As @"Route_Static")) (modelStatic m) r
 
 renderHtmlRoute :: Prism' FilePath Route -> Model -> HtmlRoute -> LByteString
 renderHtmlRoute rp m r = do
@@ -127,7 +123,7 @@ renderHead rp model = do
 -- | Link to a file under ./static
 staticRouteUrl :: IsString r => Prism' FilePath Route -> Model -> FilePath -> r
 staticRouteUrl rp m =
-  SR.staticRouteUrl (modelCliAction m) (rp % (_As @"Route_Static")) (modelFiles m)
+  SR.staticRouteUrl (rp % (_As @"Route_Static")) (modelStatic m)
 
 main :: IO ()
 main = Ema.runSite_ @Route ()
