@@ -30,6 +30,11 @@ type StaticRoute = SR.StaticRoute "static" UTCTime
 data HtmlRoute
   = HtmlRoute_Index
   | HtmlRoute_About
+  | HtmlRoute_UpcomingEvents
+  | HtmlRoute_PastEvents
+  | HtmlRoute_ConnectWithUs
+  | HtmlRoute_FpJobsInIndia
+  | HtmlRoute_Resources
   deriving stock (Show, Eq, Ord, Generic)
   deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
   deriving
@@ -37,6 +42,11 @@ data HtmlRoute
     via ( HtmlRoute
             `WithSubRoutes` [ FileRoute "index.html"
                             , FileRoute "about.html"
+                            , FileRoute "upcoming.html"
+                            , FileRoute "past.html"
+                            , FileRoute "connect.html"
+                            , FileRoute "jobs.html"
+                            , FileRoute "resources.html"
                             ]
         )
   deriving (HasSubModels, IsRoute) via (HtmlRoute `WithModel` ())
@@ -67,6 +77,12 @@ renderHtmlRoute rp m r = do
       H.body $ do
         renderBody rp m r
 
+routeElem :: Prism' FilePath Route -> HtmlRoute -> H.Html -> H.Html
+routeElem rp r w = do
+  H.a ! A.class_ "text-red-500 hover:underline" ! routeHref (Route_Html r) $ w
+  where
+    routeHref r' = A.href (fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp r')
+
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
@@ -74,16 +90,22 @@ renderBody rp model r = do
     H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
-        "You are on the index page. "
-        routeElem HtmlRoute_About "Go to About"
+        "FP India"
+        routeElem rp HtmlRoute_Index "Index"
+        routeElem rp HtmlRoute_About "About"
       HtmlRoute_About -> do
-        routeElem HtmlRoute_Index "Go to Index"
+        "You are on the about page."
         H.div $ H.p "We are a community and a meetup group for Functional Programming language enthusiasts in India. You can join and participate in the online events even if you are somewhere else. We organise regular meetups, events, webinars, and workshops, all centered around Functional Programming and related technologies. All skill levels from novices to gods of category theory are welcome."
-  where
-    routeElem r' w = do
-      H.a ! A.class_ "text-red-500 hover:underline" ! routeHref (Route_Html r') $ w
-    routeHref r' =
-      A.href (fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp r')
+      HtmlRoute_UpcomingEvents -> do
+        "You are on the upcoming events page."
+      HtmlRoute_PastEvents -> do
+        "You are on the past events page."
+      HtmlRoute_ConnectWithUs -> do
+        "you are on the Connect with us page."
+      HtmlRoute_FpJobsInIndia -> do
+        "you are on the FP jobs in india page."
+      HtmlRoute_Resources -> do
+        "you are on the resources page."
 
 renderHead :: Prism' FilePath Route -> Model -> H.Html
 renderHead rp model = do
