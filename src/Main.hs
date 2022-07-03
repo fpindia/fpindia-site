@@ -38,7 +38,7 @@ data HtmlRoute
   | HtmlRoute_ConnectWithUs
   | HtmlRoute_FpJobsInIndia
   | HtmlRoute_Resources
-  deriving stock (Show, Eq, Ord, Generic)
+  deriving stock (Show, Eq, Ord, Generic, Enum, Bounded)
   deriving anyclass (SOP.Generic, SOP.HasDatatypeInfo)
   deriving
     (HasSubRoutes, HasSubModels, IsRoute)
@@ -77,26 +77,36 @@ renderHtmlRoute rp m r = do
     H.docType
     H.html ! A.lang "en" $ do
       H.head $ do
-        renderHead rp m
+        renderHead rp m r
       H.body $ do
         renderBody rp m r
 
 routeElem :: Prism' FilePath Route -> HtmlRoute -> H.Html -> H.Html
 routeElem rp r w = do
-  H.a ! A.class_ "text-red-500 hover:underline" ! routeHref (Route_Html r) $ w
-  where
-    routeHref r' = A.href (fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp r')
+  H.a ! A.class_ "text-red-500 hover:underline" ! A.href (routeHref rp r) $ w
+
+routeHref :: Prism' FilePath Route -> HtmlRoute -> H.AttributeValue
+routeHref rp r = fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp (Route_Html r)
+
+routeTitle :: HtmlRoute -> Text
+routeTitle r = case r of
+  HtmlRoute_About -> "About"
+  HtmlRoute_ConnectWithUs -> "Connect"
+  HtmlRoute_FpJobsInIndia -> "Jobs"
+  HtmlRoute_Index -> "Home"
+  HtmlRoute_PastEvents -> "Archive"
+  HtmlRoute_Resources -> "Resources"
+  HtmlRoute_UpcomingEvents -> "Events"
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
+    renderNavbar rp
     H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
     H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
         "FP India"
-        routeElem rp HtmlRoute_Index "Index"
-        routeElem rp HtmlRoute_About "About"
       HtmlRoute_About -> do
         "You are on the about page."
         H.div $ H.p "We are a community and a meetup group for Functional Programming language enthusiasts in India. You can join and participate in the online events even if you are somewhere else. We organise regular meetups, events, webinars, and workshops, all centered around Functional Programming and related technologies. All skill levels from novices to gods of category theory are welcome."
@@ -111,13 +121,21 @@ renderBody rp model r = do
       HtmlRoute_Resources -> do
         "you are on the resources page."
 
-renderHead :: Prism' FilePath Route -> Model -> H.Html
-renderHead rp model = do
+renderNavbar :: Prism' FilePath Route -> H.Html
+renderNavbar rp =
+  H.nav ! A.class_ "w-full h-1/4 text-xl font-bold flex space-x-4  mb-4" $ do
+    forM_ universe $ \r -> renderURL (H.toHtml $ routeTitle r) (routeHref rp r)
+  where
+    renderURL menuItem path = H.a ! A.href path ! A.class_ "bg-rose-300 rounded p-2" $ menuItem
+
+renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
+renderHead rp model r = do
   H.meta ! A.charset "UTF-8"
   -- This makes the site mobile friendly by default.
   H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1"
-  H.title "FPIndia"
+  H.title $ H.toHtml $ routeTitle r <> " - Functional Programming India"
   H.base ! A.href "/"
+  -- H.script ! A.src (staticRouteUrl rp model "main.js") $ ""
   H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl rp model "tailwind.css")
 
 -- | Link to a file under ./static
