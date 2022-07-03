@@ -95,5 +95,12 @@ executable fpindia-site
     ViewPatterns
 
   main-is:            Main.hs
+  other-modules:
+    FPIndia.Model
+    FPIndia.Route
+    FPIndia.Site
+    FPIndia.View
+    FPIndia.View.Util
+
   hs-source-dirs:     src
   default-language:   Haskell2010
