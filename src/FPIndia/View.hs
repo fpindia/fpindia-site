@@ -25,11 +25,11 @@ renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
     renderNavbar rp
-    H.h1 ! A.class_ "text-3xl font-bold" $ "FPIndia WIP"
+    H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
     H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
-        "FP India"
+        "Home page"
       HtmlRoute_About -> do
         "You are on the about page."
         H.div $ H.p "We are a community and a meetup group for Functional Programming language enthusiasts in India. You can join and participate in the online events even if you are somewhere else. We organise regular meetups, events, webinars, and workshops, all centered around Functional Programming and related technologies. All skill levels from novices to gods of category theory are welcome."
