@@ -8,13 +8,7 @@ import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import FPIndia.Model (Model (..))
 import FPIndia.Route (HtmlRoute (..), Route (Route_Html))
 import Optics.Core (Prism', (%))
-import Text.Blaze.Html5 ((!))
 import Text.Blaze.Html5 qualified as H
-import Text.Blaze.Html5.Attributes qualified as A
-
-routeElem :: Prism' FilePath Route -> HtmlRoute -> H.Html -> H.Html
-routeElem rp r w = do
-  H.a ! A.class_ "text-red-500 hover:underline" ! A.href (routeHref rp r) $ w
 
 routeHref :: Prism' FilePath Route -> HtmlRoute -> H.AttributeValue
 routeHref rp r = fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp (Route_Html r)
