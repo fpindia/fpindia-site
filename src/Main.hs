@@ -1,8 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE UndecidableInstances #-}
 
--- Color Palette => Rose 300 / Cyan 900 + Dark
-
 module Main where
 
 import Data.Generics.Sum.Any (AsAny (_As))
@@ -137,8 +135,8 @@ renderHead rp model r = do
   H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1"
   H.title $ H.toHtml $ routeTitle r <> " - Functional Programming India"
   H.base ! A.href "/"
+  -- H.script ! A.src (staticRouteUrl rp model "main.js") $ ""
   H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl rp model "tailwind.css")
-  H.script ! A.src (staticRouteUrl rp model "main.js") $ ""
 
 -- | Link to a file under ./static
 staticRouteUrl :: IsString r => Prism' FilePath Route -> Model -> FilePath -> r
