@@ -4,7 +4,7 @@ module FPIndia.View where
 
 import FPIndia.Model (Model)
 import FPIndia.Route (HtmlRoute (..), Route)
-import FPIndia.View.Util (routeHref, routeTitle, staticRouteUrl)
+import FPIndia.View.Util (renderMarkdown, routeHref, routeTitle, staticRouteUrl)
 import Optics.Core (Prism')
 import Text.Blaze.Html.Renderer.Utf8 qualified as RU
 import Text.Blaze.Html5 ((!))
@@ -29,10 +29,9 @@ renderBody rp model r = do
     H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
-        "Home page"
+        renderMarkdown model "index.md"
       HtmlRoute_About -> do
-        "You are on the about page."
-        H.div $ H.p "We are a community and a meetup group for Functional Programming language enthusiasts in India. You can join and participate in the online events even if you are somewhere else. We organise regular meetups, events, webinars, and workshops, all centered around Functional Programming and related technologies. All skill levels from novices to gods of category theory are welcome."
+        renderMarkdown model "about.md"
       HtmlRoute_UpcomingEvents -> do
         "You are on the upcoming events page."
       HtmlRoute_PastEvents -> do
