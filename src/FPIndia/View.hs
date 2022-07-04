@@ -43,6 +43,7 @@ renderBody rp model r = do
         "you are on the FP jobs in india page."
       HtmlRoute_Resources -> do
         "you are on the resources page."
+    renderFooter
 
 renderNavbar :: Prism' FilePath Route -> H.Html
 renderNavbar rp =
@@ -50,6 +51,14 @@ renderNavbar rp =
     forM_ universe $ \r -> renderURL (H.toHtml $ routeTitle r) (routeHref rp r)
   where
     renderURL menuItem path = H.a ! A.href path ! A.class_ "bg-rose-300 rounded p-2" $ menuItem
+
+renderFooter :: H.Html
+renderFooter = do
+  H.footer
+  ! A.class_ "w-full h-10 bg-rose-300 rounded p-2 border-t-2 border-white fixed left-0 bottom-0 flex justify-center items-center text-white text-1xl"
+  $ do
+    H.pre "Made with " ! A.class_ "text-black"
+    H.a ! A.class_ "text-red-500 hover" ! A.href "https://ema.srid.ca/" $ "Ema"
 
 renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderHead rp model r = do
