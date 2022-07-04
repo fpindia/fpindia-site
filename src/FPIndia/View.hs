@@ -33,15 +33,15 @@ renderBody rp model r = do
       HtmlRoute_About -> do
         renderMarkdown model "about.md"
       HtmlRoute_UpcomingEvents -> do
-        "You are on the upcoming events page."
+        renderMarkdown model "events.md"
       HtmlRoute_PastEvents -> do
-        "You are on the past events page."
+        renderMarkdown model "archive.md"
       HtmlRoute_ConnectWithUs -> do
-        "you are on the Connect with us page."
+        renderMarkdown model "connect.md"
       HtmlRoute_FpJobsInIndia -> do
-        "you are on the FP jobs in india page."
+        renderMarkdown model "jobs.md"
       HtmlRoute_Resources -> do
-        "you are on the resources page."
+        renderMarkdown model "resources.md"
     renderFooter
 
 renderNavbar :: Prism' FilePath Route -> H.Html
