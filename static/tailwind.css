@@ -1203,6 +1203,16 @@ select {
           text-decoration-color: #4338ca;
 }
 
+.prose-a\:decoration-rose-700 :is(:where(a):not(:where([class~="not-prose"] *))) {
+  -webkit-text-decoration-color: #be123c;
+          text-decoration-color: #be123c;
+}
+
+.prose-a\:decoration-solid :is(:where(a):not(:where([class~="not-prose"] *))) {
+  -webkit-text-decoration-style: solid;
+          text-decoration-style: solid;
+}
+
 .prose-a\:decoration-wavy :is(:where(a):not(:where([class~="not-prose"] *))) {
   -webkit-text-decoration-style: wavy;
           text-decoration-style: wavy;
