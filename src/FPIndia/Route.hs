@@ -42,8 +42,8 @@ data HtmlRoute
             '[ WithSubRoutes
                 '[ FileRoute "index.html"
                  , FileRoute "about.html"
-                 , FileRoute "upcoming.html"
-                 , FileRoute "past.html"
+                 , FileRoute "events.html"
+                 , FileRoute "archive.html"
                  , FileRoute "connect.html"
                  , FileRoute "jobs.html"
                  , FileRoute "resources.html"
