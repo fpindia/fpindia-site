@@ -26,7 +26,7 @@ renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
     renderNavbar rp
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
-    H.img ! A.src (staticRouteUrl rp model "logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
+    H.img ! A.src (staticRouteUrl rp model "fpindia-logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
         renderMarkdown model "index.md"
