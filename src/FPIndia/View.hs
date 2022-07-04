@@ -52,11 +52,12 @@ renderNavbar rp =
   where
     renderURL menuItem path = H.a ! A.href path ! A.class_ "bg-rose-300 rounded p-2" $ menuItem
 
-renderFooter :: H.Html  
+renderFooter :: H.Html
 renderFooter = do
-  H.footer 
-  ! A.class_ "w-full h-10 bg-rose-300 rounded p-2 border-t-2 border-white fixed left-0 bottom-0 flex justify-center items-center text-white text-1xl" $ do
-    H.pre "Made with " ! A.class_ "text-black" 
+  H.footer
+  ! A.class_ "w-full h-10 bg-rose-300 rounded p-2 border-t-2 border-white fixed left-0 bottom-0 flex justify-center items-center text-white text-1xl"
+  $ do
+    H.pre "Made with " ! A.class_ "text-black"
     H.a ! A.class_ "text-red-500 hover" ! A.href "https://ema.srid.ca/" $ "Ema"
 
 renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
