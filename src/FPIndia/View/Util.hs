@@ -40,7 +40,7 @@ renderMarkdown m fp =
   where
     -- Style Pandoc generated HTML en masse here.
     -- See https://tailwindcss.com/docs/typography-plugin
-    proseStyle = "prose-a:underline prose-a:decoration-indigo-700 prose-a:decoration-wavy prose-a:decoration-2 hover:prose-a:decoration-4"
+    proseStyle = "prose-a:underline prose-a:decoration-rose-700 prose-a:decoration-solid prose-a:decoration-2 hover:prose-a:decoration-4"
 
 -- | Like `renderMarkdown` but without the prose styling
 renderMarkdown' :: Model -> String -> H.Html
