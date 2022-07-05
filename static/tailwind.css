@@ -1198,11 +1198,6 @@ select {
           text-decoration-line: underline;
 }
 
-.prose-a\:decoration-indigo-700 :is(:where(a):not(:where([class~="not-prose"] *))) {
-  -webkit-text-decoration-color: #4338ca;
-          text-decoration-color: #4338ca;
-}
-
 .prose-a\:decoration-rose-700 :is(:where(a):not(:where([class~="not-prose"] *))) {
   -webkit-text-decoration-color: #be123c;
           text-decoration-color: #be123c;
@@ -1211,11 +1206,6 @@ select {
 .prose-a\:decoration-solid :is(:where(a):not(:where([class~="not-prose"] *))) {
   -webkit-text-decoration-style: solid;
           text-decoration-style: solid;
-}
-
-.prose-a\:decoration-wavy :is(:where(a):not(:where([class~="not-prose"] *))) {
-  -webkit-text-decoration-style: wavy;
-          text-decoration-style: wavy;
 }
 
 .prose-a\:decoration-2 :is(:where(a):not(:where([class~="not-prose"] *))) {
