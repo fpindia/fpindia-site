@@ -2,7 +2,8 @@
 
 module FPIndia.View where
 
-import FPIndia.Model (Model)
+import FPIndia.Jobs qualified as Jobs
+import FPIndia.Model (Model (modelJobs))
 import FPIndia.Route (HtmlRoute (..), Route)
 import FPIndia.View.Util (renderMarkdown, routeHref, routeTitle, staticRouteUrl)
 import Optics.Core (Prism')
@@ -39,6 +40,14 @@ renderBody rp model r = do
       HtmlRoute_ConnectWithUs -> do
         renderMarkdown model "connect.md"
       HtmlRoute_FpJobsInIndia -> do
+        H.div ! A.class_ "my-8" $ do
+          H.header "Current Jobs"
+          forM_ (modelJobs model) $ \job ->
+            H.li $ do
+              H.b $ H.toHtml $ Jobs.jobName job
+              " - "
+              H.em $ H.toHtml $ Jobs.jobLocation job
+        H.header "About"
         renderMarkdown model "jobs.md"
       HtmlRoute_Resources -> do
         renderMarkdown model "resources.md"

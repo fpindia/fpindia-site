@@ -27,6 +27,7 @@ executable fpindia-site
     , base
     , blaze-html
     , blaze-markup
+    , cassava
     , containers
     , data-default
     , directory
@@ -96,6 +97,7 @@ executable fpindia-site
 
   main-is:            Main.hs
   other-modules:
+    FPIndia.Jobs
     FPIndia.Model
     FPIndia.Route
     FPIndia.Site
