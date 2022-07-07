@@ -19,11 +19,11 @@ renderHtmlRoute rp m r = do
     H.html ! A.lang "en" $ do
       H.head $ do
         renderHead rp m r
-      H.body $ do
+      H.body ! A.class_ "bg-slate-200 text-stone-900" $ do
         renderBody rp m r
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
-renderBody rp model r = do
+renderBody rp model r = do 
   H.div ! A.class_ "container mx-auto mt-8 p-2" $ do
     renderNavbar rp
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
@@ -58,15 +58,15 @@ renderNavbar rp =
   H.nav ! A.class_ "w-full h-1/4 text-xl font-bold flex space-x-4  mb-4" $ do
     forM_ universe $ \r -> renderURL (H.toHtml $ routeTitle r) (routeHref rp r)
   where
-    renderURL menuItem path = H.a ! A.href path ! A.class_ "bg-rose-300 rounded p-2" $ menuItem
+    renderURL menuItem path = H.a ! A.href path ! A.class_ "p-2 border-b-2 transition color hover:border-stone-900 duration-300" $ menuItem
 
 renderFooter :: H.Html
 renderFooter = do
   H.footer
-  ! A.class_ "w-full h-10 bg-rose-300 rounded p-2 border-t-2 border-white fixed left-0 bottom-0 flex justify-center items-center text-white text-1xl"
+  ! A.class_ "w-full h-10 bg-stone-600 rounded p-2 border-t-2 border-white fixed left-0 bottom-0 flex justify-center items-center text-white text-1xl"
   $ do
-    H.pre "Made with " ! A.class_ "text-black"
-    H.a ! A.class_ "text-red-500 hover" ! A.href "https://ema.srid.ca/" $ "Ema"
+    H.pre "Made with " ! A.class_ "text-slate-300"
+    H.a ! A.class_ "text-rose-300 hover" ! A.href "https://ema.srid.ca/" $ "Ema"
 
 renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderHead rp model r = do
