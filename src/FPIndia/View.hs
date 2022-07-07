@@ -23,7 +23,7 @@ renderHtmlRoute rp m r = do
         renderBody rp m r
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
-renderBody rp model r = do 
+renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2 mb-10" $ do
     renderNavbar rp
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
