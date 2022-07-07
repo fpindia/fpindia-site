@@ -1,3 +1,3 @@
-name,location
-Juspay,Bangalore
-ByteAlly,Chennai
+name,website,source,location,languages,active_status,permalink
+Juspay,https://juspay.in/sde-functional-programming,Juspay,Bangalore,[Haskell | Purescript],Active,https://www.juspay.in
+ByteAlly,https://www.linkedin.com/jobs/view/2222656592/,LinkedIn,Chennai,Haskell,Not Active,https://byteally.com/

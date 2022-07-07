@@ -14,13 +14,33 @@ import System.UnionMount qualified as UM
 import UnliftIO
 
 data Job = Job
-  { jobName :: !Text
-  , jobLocation :: !Text
+  { jobName :: Text
+  , jobWebsite :: Text
+  , jobSource :: Text
+  , jobLocation :: Text
+  , jobLanguages :: Text
+  , jobPermalink :: Text
+  , jobActiveStatus :: Text
   }
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Show, Ord, Read)
+
+--data Source = Source {sourceType :: SourceType, sourceUrl :: Text} deriving stock (Show)
+--data SourceType = Reddit | Github | Twitter | LinkedIn | OtherJobSite | OtherForum | OtherSourceType deriving stock (Show)
+
+-- Some languages of the top of my head, we can add more
+-- data Language = Haskell | PureScript | Scala | Erlang | Agda | Idris | OtherLanguage String
+--   deriving stock (Eq, Show)
 
 instance FromNamedRecord Job where
-  parseNamedRecord r = Job <$> r .: "name" <*> r .: "location"
+  parseNamedRecord r =
+    Job
+      <$> r .: "name"
+      <*> r .: "website"
+      <*> r .: "source"
+      <*> r .: "location"
+      <*> r .: "languages"
+      <*> r .: "permalink"
+      <*> r .: "active_status"
 
 jobsDynamic ::
   forall m.

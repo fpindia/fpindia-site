@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances #-}
+--{-# LANGUAGE UndecidableInstances #-}
 
 module FPIndia.View where
 
@@ -46,7 +46,17 @@ renderBody rp model r = do
             H.li $ do
               H.b $ H.toHtml $ Jobs.jobName job
               " - "
+              H.em $ H.toHtml $ Jobs.jobWebsite job
+              " - "
+              H.em $ H.toHtml $ Jobs.jobSource job
+              " - "
               H.em $ H.toHtml $ Jobs.jobLocation job
+              " - "
+              H.em $ H.toHtml $ Jobs.jobLanguages job
+              " - "
+              H.em $ H.toHtml $ Jobs.jobPermalink job
+              " - "
+              H.em $ H.toHtml $ Jobs.jobActiveStatus job
         H.header "About"
         renderMarkdown model "jobs.md"
       HtmlRoute_Resources -> do
