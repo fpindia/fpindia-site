@@ -5,7 +5,8 @@ module FPIndia.View where
 import FPIndia.Jobs qualified as Jobs
 import FPIndia.Model (Model (modelJobs))
 import FPIndia.Route (HtmlRoute (..), Route)
-import FPIndia.View.Util (renderMarkdown, routeHref, routeTitle, staticRouteUrl)
+import FPIndia.View.NavBar qualified as NavBar
+import FPIndia.View.Util (renderMarkdown, routeTitle, staticRouteUrl)
 import Optics.Core (Prism')
 import Text.Blaze.Html.Renderer.Utf8 qualified as RU
 import Text.Blaze.Html5 ((!))
@@ -25,7 +26,7 @@ renderHtmlRoute rp m r = do
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2 mb-10" $ do
-    renderNavbar rp
+    NavBar.renderNavbar rp r
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
     H.img ! A.src (staticRouteUrl rp model "fpindia-logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
@@ -52,13 +53,6 @@ renderBody rp model r = do
       HtmlRoute_Resources -> do
         renderMarkdown model "resources.md"
     renderFooter
-
-renderNavbar :: Prism' FilePath Route -> H.Html
-renderNavbar rp =
-  H.nav ! A.class_ "w-full h-1/4 text-xl font-bold flex space-x-4  mb-4" $ do
-    forM_ universe $ \r -> renderURL (H.toHtml $ routeTitle r) (routeHref rp r)
-  where
-    renderURL menuItem path = H.a ! A.href path ! A.class_ "p-2 border-b-2 transition color hover:border-stone-900 duration-300" $ menuItem
 
 renderFooter :: H.Html
 renderFooter = do
