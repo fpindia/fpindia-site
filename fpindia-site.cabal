@@ -102,6 +102,7 @@ executable fpindia-site
     FPIndia.Route
     FPIndia.Site
     FPIndia.View
+    FPIndia.View.NavBar
     FPIndia.View.Util
 
   hs-source-dirs:     src
