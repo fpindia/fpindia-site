@@ -54,9 +54,9 @@ renderBody rp model r = do
     renderFooter
 
 renderNavbar :: Prism' FilePath Route -> HtmlRoute -> H.Html
-renderNavbar rp r =
+renderNavbar rp currentRoute =
   H.nav ! A.class_ "w-full h-1/4 text-xl font-bold flex space-x-4  mb-4" $ do
-    forM_ universe $ \x -> if x == r then renderURL (H.toHtml $ routeTitle x) (routeHref rp x) True else renderURL (H.toHtml $ routeTitle x) (routeHref rp x) False
+    forM_ universe $ \r -> if r == currentRoute then renderURL (H.toHtml $ routeTitle r) (routeHref rp r) True else renderURL (H.toHtml $ routeTitle r) (routeHref rp r) False
   where
     renderURL menuItem path flag =
       if flag
