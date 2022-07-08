@@ -25,7 +25,7 @@ renderHtmlRoute rp m r = do
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto mt-8 p-2 mb-10" $ do
-    renderNavbar rp
+    renderNavbar rp r
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
     H.img ! A.src (staticRouteUrl rp model "fpindia-logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
@@ -53,12 +53,15 @@ renderBody rp model r = do
         renderMarkdown model "resources.md"
     renderFooter
 
-renderNavbar :: Prism' FilePath Route -> H.Html
-renderNavbar rp =
+renderNavbar :: Prism' FilePath Route -> HtmlRoute -> H.Html
+renderNavbar rp r =
   H.nav ! A.class_ "w-full h-1/4 text-xl font-bold flex space-x-4  mb-4" $ do
-    forM_ universe $ \r -> renderURL (H.toHtml $ routeTitle r) (routeHref rp r)
+    forM_ universe $ \x -> if x == r then renderURL (H.toHtml $ routeTitle x) (routeHref rp x) True else renderURL (H.toHtml $ routeTitle x) (routeHref rp x) False
   where
-    renderURL menuItem path = H.a ! A.href path ! A.class_ "p-2 border-b-2 transition color hover:border-stone-900 duration-300" $ menuItem
+    renderURL menuItem path flag =
+      if flag
+        then H.a ! A.href path ! A.class_ "p-2 border-b-2 border-stone-900" $ menuItem
+        else H.a ! A.href path ! A.class_ "p-2 border-b-2 transition color hover:border-stone-900 duration-300" $ menuItem
 
 renderFooter :: H.Html
 renderFooter = do
