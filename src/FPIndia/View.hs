@@ -56,18 +56,18 @@ renderBody rp model r = do
 renderNavbar :: Prism' FilePath Route -> HtmlRoute -> H.Html
 renderNavbar rp currentRoute =
   H.nav ! A.class_ "w-full h-1/4 text-xl font-bold flex space-x-4  mb-4" $ do
-    forM_ universe $ \r ->
-      if r == currentRoute
-        then renderURL (H.toHtml $ routeTitle r) (routeHref rp r) True
-        else renderURL (H.toHtml $ routeTitle r) (routeHref rp r) False
+    forM_ universe $ \route ->
+      if route == currentRoute
+        then renderURL route True
+        else renderURL route False
   where
-    renderURL menuItem path isActive =
-      let y =
+    renderURL r isActive =
+      let style =
             ( if isActive
                 then "p-2 border-b-2 border-stone-900"
                 else "p-2 border-b-2 transition color hover:border-stone-900 duration-300"
             )
-       in H.a ! A.href path ! A.class_ y $ menuItem
+       in H.a ! A.href (routeHref rp r) ! A.class_ style $ H.toHtml (routeTitle r)
 
 renderFooter :: H.Html
 renderFooter = do
