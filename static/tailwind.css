@@ -1117,10 +1117,6 @@ select {
   display: flex;
 }
 
-.table {
-  display: table;
-}
-
 .h-1\/4 {
   height: 25%;
 }

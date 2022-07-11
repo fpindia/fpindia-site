@@ -46,7 +46,7 @@ renderBody rp model r = do
             H.li $ do
               H.b $ H.toHtml $ Jobs.jobName job
               " - "
-              H.em $ H.toHtml $ Jobs.jobWebsite job
+              H.href $ H.toHtml $ Jobs.jobWebsite job
               " - "
               H.em $ H.toHtml $ Jobs.jobSource job
               " - "

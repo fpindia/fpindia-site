@@ -5,7 +5,7 @@ module FPIndia.Jobs (
 
 import Control.Exception (throw)
 import Control.Monad.Logger
-import Data.Csv (FromNamedRecord (..), (.:))
+import Data.Csv (FromField, FromNamedRecord (..), (.:))
 import Data.Csv qualified as Csv
 import Ema (Dynamic (Dynamic))
 import GHC.IO.Exception (userError)
@@ -14,33 +14,85 @@ import System.UnionMount qualified as UM
 import UnliftIO
 
 data Job = Job
-  { jobName :: Text
-  , jobWebsite :: Text
-  , jobSource :: Text
-  , jobLocation :: Text
-  , jobLanguages :: Text
-  , jobPermalink :: Text
-  , jobActiveStatus :: Text
+  { jobName :: !String
+  , jobSource :: !SourceType
+  , jobWebsite :: !String
+  , --  , jobWebsite :: !SourceUrl
+    jobLocation :: !Text
+  , jobLanguages :: !Language
+  , jobPermalink :: !Text
+  , jobActiveStatus :: !Status
   }
-  deriving stock (Eq, Show, Ord, Read)
 
---data Source = Source {sourceType :: SourceType, sourceUrl :: Text} deriving stock (Show)
---data SourceType = Reddit | Github | Twitter | LinkedIn | OtherJobSite | OtherForum | OtherSourceType deriving stock (Show)
+-- data Source = Source
+--   { sourceType :: SourceType
+--   , sourceUrl :: SourceUrl
+--   }
 
--- Some languages of the top of my head, we can add more
--- data Language = Haskell | PureScript | Scala | Erlang | Agda | Idris | OtherLanguage String
---   deriving stock (Eq, Show)
+data SourceType
+  = Reddit
+  | Github
+  | Twitter
+  | LinkedIn
+  | OtherJobSite
+  | OtherForum
+  | OtherSourceType
+
+--data SourceUrl = Verified String | Other String
+data Language
+  = Haskell
+  | PureScript
+  | Scala
+  | Ocaml
+  | Rust
+  | Erlang
+  | Agda
+  | Elixir
+  | Idris
+
+data Status = Active | NotActive
 
 instance FromNamedRecord Job where
   parseNamedRecord r =
     Job
       <$> r .: "name"
-      <*> r .: "website"
       <*> r .: "source"
+      <*> r .: "website"
       <*> r .: "location"
       <*> r .: "languages"
       <*> r .: "permalink"
       <*> r .: "active_status"
+
+instance FromField SourceType where
+  parseField s
+    | s == "Reddit" = pure Reddit
+    | s == "Github" = pure Github
+    | s == "Twitter" = pure Twitter
+    | s == "LinkedIn" = pure LinkedIn
+    | s == "OtherJobSite" = pure OtherJobSite
+    | s == "OtherForum" = pure OtherForum
+    | s == "OtherSourceType" = pure OtherSourceType
+    | otherwise = empty
+
+instance FromField Language where
+  parseField s
+    | s == "Haskell" = pure Haskell
+    | s == "PureScript" = pure PureScript
+    | s == "Scala" = pure Scala
+    | s == "Ocaml" = pure Ocaml
+    | s == "Rust" = pure Rust
+    | s == "Erlang" = pure Erlang
+    | s == "Agda" = pure Agda
+    | s == "Elixir" = pure Elixir
+    | s == "Idris" = pure Idris
+    --    | s == "OtherLanguage" = pure String
+    | otherwise = empty
+
+instance FromField Status where
+  parseField s
+    | s == "Active" = pure Active
+    | s == "NotActive" = pure NotActive
+    | otherwise = empty
 
 jobsDynamic ::
   forall m.
