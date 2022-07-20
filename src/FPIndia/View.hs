@@ -43,11 +43,26 @@ renderBody rp model r = do
       HtmlRoute_FpJobsInIndia -> do
         H.div ! A.class_ "my-8" $ do
           H.header "Current Jobs"
-          forM_ (modelJobs model) $ \job ->
-            H.li $ do
-              H.b $ H.toHtml $ Jobs.jobName job
-              " - "
-              H.em $ H.toHtml $ Jobs.jobLocation job
+          H.table ! A.class_ "table table-auto border-2 border-y-black container text-center max-w-3xl" $ do
+            H.thead $ do
+              H.tr $ do
+                H.th "Job name"
+                H.th "Website"
+                H.th "Source"
+                H.th "Location"
+                H.th "Languages"
+                H.th "Permalink"
+                H.th "Active Status"
+            forM_ (modelJobs model) $ \job ->
+              H.tbody $ do
+                H.tr $ do
+                  H.td $ H.toHtml $ Jobs.jobName job
+                  H.td $ H.toHtml $ Jobs.jobWebsite job
+                  H.td $ H.toHtml $ Jobs.jobSource job
+                  H.td $ H.toHtml $ Jobs.jobLocation job
+                  H.td $ H.toHtml $ Jobs.jobLanguages job
+                  H.td $ H.toHtml $ Jobs.jobPermalink job
+                  H.td $ H.toHtml $ Jobs.jobActiveStatus job
         H.header "About"
         renderMarkdown model "jobs.md"
       HtmlRoute_Resources -> do
