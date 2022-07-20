@@ -43,7 +43,7 @@ renderBody rp model r = do
       HtmlRoute_FpJobsInIndia -> do
         H.div ! A.class_ "my-8" $ do
           H.header "Current Jobs"
-          H.table ! A.class_ "table-auto" $ do
+          H.table ! A.class_ "table table-auto border-2 border-y-black container text-center max-w-3xl" $ do
             H.thead $ do
               H.tr $ do
                 H.th "Job name"
