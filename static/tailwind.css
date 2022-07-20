@@ -1121,12 +1121,16 @@ select {
   display: flex;
 }
 
-.h-1\/4 {
-  height: 25%;
+.table {
+  display: table;
 }
 
 .h-10 {
   height: 2.5rem;
+}
+
+.h-1\/4 {
+  height: 25%;
 }
 
 .w-32 {
@@ -1135,6 +1139,10 @@ select {
 
 .w-full {
   width: 100%;
+}
+
+.table-auto {
+  table-layout: auto;
 }
 
 .items-center {
@@ -1155,22 +1163,22 @@ select {
   border-radius: 0.25rem;
 }
 
-.border-b-2 {
-  border-bottom-width: 2px;
-}
-
 .border-t-2 {
   border-top-width: 2px;
 }
 
-.border-stone-900 {
-  --tw-border-opacity: 1;
-  border-color: rgb(28 25 23 / var(--tw-border-opacity));
+.border-b-2 {
+  border-bottom-width: 2px;
 }
 
 .border-white {
   --tw-border-opacity: 1;
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
+}
+
+.border-stone-900 {
+  --tw-border-opacity: 1;
+  border-color: rgb(28 25 23 / var(--tw-border-opacity));
 }
 
 .bg-slate-200 {

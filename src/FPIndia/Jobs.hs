@@ -15,12 +15,25 @@ import UnliftIO
 
 data Job = Job
   { jobName :: !Text
+  , jobWebsite :: !Text
+  , jobSource :: !Text
   , jobLocation :: !Text
+  , jobLanguages :: !Text
+  , jobPermalink :: !Text
+  , jobActiveStatus :: !Text
   }
   deriving stock (Eq, Show)
 
 instance FromNamedRecord Job where
-  parseNamedRecord r = Job <$> r .: "name" <*> r .: "location"
+  parseNamedRecord r =
+    Job
+      <$> r .: "name"
+      <*> r .: "website"
+      <*> r .: "source"
+      <*> r .: "location"
+      <*> r .: "language"
+      <*> r .: "permalink"
+      <*> r .: "activestatus"
 
 jobsDynamic ::
   forall m.
