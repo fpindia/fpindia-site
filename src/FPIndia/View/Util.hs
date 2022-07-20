@@ -4,7 +4,6 @@ module FPIndia.View.Util where
 
 import Data.Generics.Sum.Any (AsAny (_As))
 import Ema
-import Ema.Route.Encoder (applyRouteEncoder)
 import Ema.Route.Lib.Extra.MarkdownRoute qualified as MR
 import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import FPIndia.Model (Model (..))
@@ -46,7 +45,7 @@ renderMarkdown m fp =
 renderMarkdown' :: Model -> String -> H.Html
 renderMarkdown' m fp =
   let model = modelMarkdown m
-      rp = applyRouteEncoder (routeEncoder @MR.MarkdownRoute) model
+      rp = fromPrism_ $ routePrism @MR.MarkdownRoute model
       (pandoc, render) = siteOutput rp model $ fromString fp
    in renderRawHtml $ MR.unMarkdownHtml $ render pandoc
   where
