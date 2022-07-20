@@ -7,11 +7,6 @@ import Ema.Route.Generic.TH
 import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import FPIndia.Model (Model)
 
-data Route
-  = Route_Html HtmlRoute
-  | Route_Static StaticRoute
-  deriving stock (Eq, Show, Ord, Generic)
-
 type StaticRoute = SR.StaticRoute "static"
 
 data HtmlRoute
@@ -39,6 +34,11 @@ deriveIsRoute
          ]
      ]
     |]
+
+data Route
+  = Route_Html HtmlRoute
+  | Route_Static StaticRoute
+  deriving stock (Eq, Show, Ord, Generic)
 
 deriveGeneric ''Route
 deriveIsRoute
