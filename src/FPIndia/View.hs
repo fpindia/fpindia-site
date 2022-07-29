@@ -20,18 +20,18 @@ renderHtmlRoute rp m r = do
     H.html ! A.lang "en" $ do
       H.head $ do
         renderHead rp m r
-      H.body ! A.class_ "bg-slate-200 text-stone-900" $ do
+      H.body ! A.class_ "overflow-y-scroll text-stone-900" $ do
         renderBody rp m r
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
-  H.div ! A.class_ "container mx-auto mt-8 p-2 mb-10" $ do
+  H.div ! A.class_ "container mx-auto flex flex-col items-center justify-center mt-8 p-2 mb-10" $ do
     NavBar.renderNavbar rp r
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
-    H.img ! A.src (staticRouteUrl rp model "fpindia-logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
     case r of
       HtmlRoute_Index -> do
         renderMarkdown model "index.md"
+        H.img ! A.src (staticRouteUrl rp model "fpindia-logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
       HtmlRoute_About -> do
         renderMarkdown model "about.md"
       HtmlRoute_UpcomingEvents -> do
@@ -72,10 +72,11 @@ renderBody rp model r = do
 renderFooter :: H.Html
 renderFooter = do
   H.footer
-  ! A.class_ "w-full h-10 bg-stone-600 rounded p-2 border-t-2 border-white fixed left-0 bottom-0 flex justify-center items-center text-white text-1xl"
+  ! A.class_ "flex flex-col items-center justify-center  bg-gray-50 rounded p-2 border-t-2 border-white text-sm"
   $ do
-    H.pre "Made with " ! A.class_ "text-slate-300"
-    H.a ! A.class_ "text-rose-300 hover" ! A.href "https://ema.srid.ca/" $ "Ema"
+    H.div $ do
+      "Made with "
+      H.a ! A.class_ "text-rose-700 font-bold" ! A.target "_blank" ! A.href "https://ema.srid.ca/" $ "Ema"
 
 renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderHead rp model r = do

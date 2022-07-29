@@ -1,1 +1,1 @@
-FPIndia *Home*
+Welcome to the home page of Indian Functional Programming community.
