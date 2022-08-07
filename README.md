@@ -9,7 +9,7 @@ Install Nix, enable Flakes (see below) and then run `bin/run` to get the site up
 To develop with full IDE support in Visual Studio Code, follow these steps:
 
 - [Install Nix](https://nixos.org/download.html) & [enable Flakes](https://nixos.wiki/wiki/Flakes)
-- Run `nix-shell --run haskell-language-server` to sanity check your environment 
+- Run `nix develop -c haskell-language-server` to sanity check your environment 
 - Open the repository [as single-folder workspace](https://code.visualstudio.com/docs/editor/workspaces#_singlefolder-workspaces) in Visual Studio Code
     - Install the recommended extensions
     - <kbd>Ctrl+Shift+P</kbd> to run the command "Nix-Env: Select Environment" and select `shell.nix`. The extension will ask you to reload VSCode at the end.
