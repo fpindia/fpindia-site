@@ -11,7 +11,6 @@ type StaticRoute = SR.StaticRoute "static"
 
 data HtmlRoute
   = HtmlRoute_Index
-  | HtmlRoute_About
   | HtmlRoute_UpcomingEvents
   | HtmlRoute_PastEvents
   | HtmlRoute_ConnectWithUs
@@ -25,7 +24,6 @@ deriveIsRoute
   [t|
     '[ WithSubRoutes
         '[ FileRoute "index.html"
-         , FileRoute "about.html"
          , FileRoute "events.html"
          , FileRoute "archive.html"
          , FileRoute "connect.html"

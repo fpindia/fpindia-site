@@ -26,14 +26,11 @@ renderHtmlRoute rp m r = do
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto flex flex-col items-center justify-center mt-8 p-2 mb-10" $ do
-    NavBar.renderNavbar rp r
+    NavBar.renderNavbar rp model r
     H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
     case r of
       HtmlRoute_Index -> do
         renderMarkdown model "index.md"
-        H.img ! A.src (staticRouteUrl rp model "fpindia-logo.png") ! A.class_ "w-32" ! A.alt "FPIndia Logo"
-      HtmlRoute_About -> do
-        renderMarkdown model "about.md"
       HtmlRoute_UpcomingEvents -> do
         renderMarkdown model "events.md"
       HtmlRoute_PastEvents -> do
@@ -67,16 +64,31 @@ renderBody rp model r = do
         renderMarkdown model "jobs.md"
       HtmlRoute_Resources -> do
         renderMarkdown model "resources.md"
-    renderFooter
+    renderFooter rp model
 
-renderFooter :: H.Html
-renderFooter = do
-  H.footer
-  ! A.class_ "flex flex-col items-center justify-center  bg-gray-50 rounded p-2 border-t-2 border-white text-sm"
-  $ do
-    H.div $ do
-      "Made with "
-      H.a ! A.class_ "text-rose-700 font-bold" ! A.target "_blank" ! A.href "https://ema.srid.ca/" $ "Ema"
+renderFooter :: Prism' FilePath Route -> Model -> H.Html
+renderFooter rp model = do
+  H.footer $
+    H.div ! A.class_ "mt-16 flex flex-col items-center" $ do
+      H.div ! A.class_ "mb-3 flex space-x-4" $ do
+        footerLink "mail.svg" "Mail" "mailto:team@functionalprogramming.in"
+        footerLink "github.svg" "Github" "https://github.com/fpindia/"
+        footerLink "youtube.svg" "Youtube" "https://www.youtube.com/channel/UCiySROube0vutFBu0M7pvxg"
+        footerLink "twitter.svg" "Youtube" "https://twitter.com/functionalindia"
+        footerLink "telegram.svg" "Telegram" "https://t.me/fpncr"
+        footerLink "discord.svg" "Discord" "https://discord.gg/sDHfscRdh7"
+      H.div ! A.class_ "mb-2 flex space-x-2 text-sm text-gray-500 dark:text-gray-400" $ do
+        H.div "Functional Programming India © 2022"
+      H.div ! A.class_ "mb-8 text-sm text-gray-500 dark:text-gray-400" $ do
+        "Made with "
+        H.a ! A.class_ "text-rose-700" ! A.target "_blank" ! A.rel "noopener noreferrer" ! A.href "https://www.haskell.org/" $ "Haskell"
+        " and "
+        H.a ! A.class_ "text-rose-700" ! A.target "_blank" ! A.rel "noopener noreferrer" ! A.href "https://ema.srid.ca/" $ "Ema"
+  where
+    footerLink image altText url =
+      H.a ! A.class_ "text-sm text-gray-500 transition h-8 v-8" ! A.target "_blank" ! A.rel "noopener noreferrer" ! A.href url $ do
+        H.span ! A.class_ "sr-only" $ altText
+        H.img ! A.class_ "fill-current text-gray-700 hover:border-b-2 hover:text-blue-500 dark:text-gray-200 dark:hover:text-blue-400 h-6 w-6" ! A.src (staticRouteUrl rp model image)
 
 renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderHead rp model r = do
