@@ -27,14 +27,11 @@ renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
   H.div ! A.class_ "container mx-auto flex flex-col items-center justify-center mt-8 p-2 mb-10" $ do
     NavBar.renderNavbar rp model r
-    H.h1 ! A.class_ "text-3xl font-bold" $ H.toHtml $ routeTitle r
     case r of
       HtmlRoute_Index -> do
         renderMarkdown model "index.md"
-      HtmlRoute_UpcomingEvents -> do
+      HtmlRoute_Events -> do
         renderMarkdown model "events.md"
-      HtmlRoute_PastEvents -> do
-        renderMarkdown model "archive.md"
       HtmlRoute_ConnectWithUs -> do
         renderMarkdown model "connect.md"
       HtmlRoute_FpJobsInIndia -> do
