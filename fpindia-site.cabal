@@ -37,7 +37,6 @@ executable fpindia-site
     , generics-sop
     , monad-logger
     , optics-core
-    , pandoc
     , relude
     , sop-core
     , text

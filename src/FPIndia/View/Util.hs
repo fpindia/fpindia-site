@@ -42,7 +42,7 @@ renderMarkdown m fp =
 -- | Like `renderMarkdown` but without the prose styling
 renderMarkdown' :: HasCallStack => Model -> String -> H.Html
 renderMarkdown' m fp =
-  case PR.lookupPandoc (modelMarkdown m) (fromString fp) of
+  case PR.lookupPandocRoute (modelMarkdown m) (fromString fp) of
     Nothing -> error $ "renderMarkdown: not a Pandoc ext: " <> toText fp
     Just (pandoc, render) ->
       renderRawHtml $ PR.unPandocHtml $ render pandoc

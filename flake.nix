@@ -7,7 +7,7 @@
     haskell-flake.url = "github:srid/haskell-flake";
 
     # Haskell overrides
-    ema.url = "github:srid/ema/PandocRoute";
+    ema.url = "github:srid/ema/master";
     ema.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
