@@ -26,7 +26,8 @@
             inherit (pkgs)
               treefmt
               nixpkgs-fmt
-              foreman;
+              foreman
+              git;
             inherit (hp)
               cabal-fmt
               fourmolu;

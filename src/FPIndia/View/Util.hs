@@ -18,13 +18,11 @@ routeHref rp r = fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp (Rout
 
 routeTitle :: HtmlRoute -> Text
 routeTitle r = case r of
-  HtmlRoute_About -> "About"
   HtmlRoute_ConnectWithUs -> "Connect"
   HtmlRoute_FpJobsInIndia -> "Jobs"
   HtmlRoute_Index -> "Home"
-  HtmlRoute_PastEvents -> "Archive"
+  HtmlRoute_Events -> "Events"
   HtmlRoute_Resources -> "Resources"
-  HtmlRoute_UpcomingEvents -> "Events"
 
 -- | Link to a file under ./static
 staticRouteUrl :: IsString r => Prism' FilePath Route -> Model -> FilePath -> r
