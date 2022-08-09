@@ -7,7 +7,7 @@
     haskell-flake.url = "github:srid/haskell-flake";
 
     # Haskell overrides
-    ema.url = "github:srid/ema/multisite";
+    ema.url = "github:srid/ema/master";
     ema.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
@@ -39,6 +39,7 @@
               ema;
           };
           overrides = self: super: with pkgs.haskell.lib; {
+            ema = dontCheck super.ema;
             inherit (inputs'.tailwind-haskell.packages)
               tailwind;
           };

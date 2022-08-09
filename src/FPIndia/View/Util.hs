@@ -4,7 +4,7 @@ module FPIndia.View.Util where
 
 import Data.Generics.Sum.Any (AsAny (_As))
 import Ema
-import Ema.Route.Lib.Extra.MarkdownRoute qualified as MR
+import Ema.Route.Lib.Extra.PandocRoute qualified as PR
 import Ema.Route.Lib.Extra.StaticRoute qualified as SR
 import FPIndia.Model (Model (..))
 import FPIndia.Route (HtmlRoute (..), Route (Route_Html))
@@ -40,12 +40,12 @@ renderMarkdown m fp =
     proseStyle = "rounded p-4 text-stone-800 prose-a:underline prose-a:decoration-rose-600 prose-a:decoration-solid prose-a:decoration-1 hover:prose-a:decoration-2"
 
 -- | Like `renderMarkdown` but without the prose styling
-renderMarkdown' :: Model -> String -> H.Html
+renderMarkdown' :: HasCallStack => Model -> String -> H.Html
 renderMarkdown' m fp =
-  let model = modelMarkdown m
-      rp = fromPrism_ $ routePrism @MR.MarkdownRoute model
-      (pandoc, render) = siteOutput rp model $ fromString fp
-   in renderRawHtml $ MR.unMarkdownHtml $ render pandoc
+  case PR.lookupPandocRoute (modelMarkdown m) (fromString fp) of
+    Nothing -> error $ "renderMarkdown: not a Pandoc ext: " <> toText fp
+    Just (pandoc, render) ->
+      renderRawHtml $ PR.unPandocHtml $ render pandoc
   where
     renderRawHtml =
       H.unsafeLazyByteString . encodeUtf8

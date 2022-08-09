@@ -6,7 +6,7 @@ module FPIndia.Site where
 import Data.Default (def)
 import Data.Generics.Sum.Any (AsAny (_As))
 import Ema
-import Ema.Route.Lib.Extra.MarkdownRoute qualified as MR
+import Ema.Route.Lib.Extra.PandocRoute qualified as PR
 import FPIndia.Jobs qualified as Jobs
 import FPIndia.Model (Model (Model, modelStatic))
 import FPIndia.Route (Route (..), StaticRoute)
@@ -16,12 +16,17 @@ import Optics.Core ((%))
 instance EmaSite Route where
   siteInput cliAct () = do
     staticRouteDyn <- siteInput @StaticRoute cliAct ()
-    markdownDyn <- siteInput @MR.MarkdownRoute cliAct $ def {MR.argBaseDir = "markdown"}
+    markdownDyn <-
+      siteInput @PR.PandocRoute cliAct $
+        def
+          { PR.argBaseDir = "markdown"
+          , PR.argFormats = one ".md"
+          }
     jobsDyn <- Jobs.jobsDynamic "jobs/jobs.csv"
     pure $ Model <$> staticRouteDyn <*> markdownDyn <*> jobsDyn
   siteOutput rp m = \case
     Route_Html r ->
-      Ema.AssetGenerated Ema.Html $ renderHtmlRoute rp m r
+      pure $ Ema.AssetGenerated Ema.Html $ renderHtmlRoute rp m r
     Route_Static r ->
       siteOutput (rp % (_As @"Route_Static")) (modelStatic m) r
 
