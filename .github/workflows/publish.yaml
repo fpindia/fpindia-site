@@ -17,12 +17,12 @@ jobs:
       - name: Build 🔧
         run: |
           nix build -j 4
+          nix run .#tailwind-run -- --help # Just to cache the Nix build
       - name: Generate HTML 🔧
         if: github.ref == 'refs/heads/master'
         run: |
           mkdir ./output
           export TARGET=$(pwd)/output
-          # nix develop -c tailwind-run -o static/tailwind.css 'src/**/*.hs' 
           nix run .#tailwind-run -- -o static/tailwind.css 'src/**/*.hs'
           ./result/bin/fpindia-site gen $TARGET
       - name: Deploy to gh-pages 🚀
