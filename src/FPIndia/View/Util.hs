@@ -32,7 +32,7 @@ staticRouteUrl rp m =
 -- | Render a Markdown file inside ./markdown directory
 renderMarkdown :: Model -> String -> H.Html
 renderMarkdown m fp =
-  H.div ! A.class_ ("prose " <> proseStyle) $ do
+  H.div ! A.class_ ("prose max-w-none " <> proseStyle) $ do
     renderMarkdown' m fp
   where
     -- Style Pandoc generated HTML en masse here.
