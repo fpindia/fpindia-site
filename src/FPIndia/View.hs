@@ -20,48 +20,49 @@ renderHtmlRoute rp m r = do
     H.html ! A.lang "en" $ do
       H.head $ do
         renderHead rp m r
-      H.body ! A.class_ "overflow-y-scroll text-stone-900" $ do
+      H.body ! A.class_ "text-stone-900 antialiased" $ do
         renderBody rp m r
 
 renderBody :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderBody rp model r = do
-  H.div ! A.class_ "container mx-auto flex flex-col items-center justify-center mt-8 p-2 mb-10" $ do
-    NavBar.renderNavbar rp model r
-    case r of
-      HtmlRoute_Index -> do
-        renderMarkdown model "index.md"
-      HtmlRoute_Events -> do
-        renderMarkdown model "events.md"
-      HtmlRoute_ConnectWithUs -> do
-        renderMarkdown model "connect.md"
-      HtmlRoute_FpJobsInIndia -> do
-        H.div ! A.class_ "my-8" $ do
-          H.header "Current Jobs"
-          H.table ! A.class_ "table table-auto border-2 border-y-black container text-center max-w-3xl" $ do
-            H.thead $ do
-              H.tr $ do
-                H.th "Job name"
-                H.th "Website"
-                H.th "Source"
-                H.th "Location"
-                H.th "Languages"
-                H.th "Permalink"
-                H.th "Active Status"
-            forM_ (modelJobs model) $ \job ->
-              H.tbody $ do
+  H.div ! A.class_ "mx-auto max-w-3xl px-4" $ do
+    H.div ! A.class_ "container mx-auto flex flex-col mt-8 p-2 pb-0" $ do
+      NavBar.renderNavbar rp model r
+      H.main $ case r of
+        HtmlRoute_Index -> do
+          renderMarkdown model "index.md"
+        HtmlRoute_Events -> do
+          renderMarkdown model "events.md"
+        HtmlRoute_ConnectWithUs -> do
+          renderMarkdown model "connect.md"
+        HtmlRoute_FpJobsInIndia -> do
+          H.div ! A.class_ "my-4" $ do
+            H.img ! A.class_ "h-20 m-auto mb-5" ! A.src (staticRouteUrl rp model "underconstruction.svg")
+            H.header ! A.class_ "text-2xl font-bold pb-6" $ "Current Jobs"
+            H.table ! A.class_ "table table-auto border-2 border-y-black container text-center max-w-3xl" $ do
+              H.thead $ do
                 H.tr $ do
-                  H.td $ H.toHtml $ Jobs.jobName job
-                  H.td $ H.toHtml $ Jobs.jobWebsite job
-                  H.td $ H.toHtml $ Jobs.jobSource job
-                  H.td $ H.toHtml $ Jobs.jobLocation job
-                  H.td $ H.toHtml $ Jobs.jobLanguages job
-                  H.td $ H.toHtml $ Jobs.jobPermalink job
-                  H.td $ H.toHtml $ Jobs.jobActiveStatus job
-        H.header "About"
-        renderMarkdown model "jobs.md"
-      HtmlRoute_Resources -> do
-        renderMarkdown model "resources.md"
-    renderFooter rp model
+                  H.th "Job name"
+                  H.th "Website"
+                  H.th "Source"
+                  H.th "Location"
+                  H.th "Languages"
+                  H.th "Permalink"
+                  H.th "Active Status"
+              forM_ (modelJobs model) $ \job ->
+                H.tbody $ do
+                  H.tr $ do
+                    H.td $ H.toHtml $ Jobs.jobName job
+                    H.td $ H.toHtml $ Jobs.jobWebsite job
+                    H.td $ H.toHtml $ Jobs.jobSource job
+                    H.td $ H.toHtml $ Jobs.jobLocation job
+                    H.td $ H.toHtml $ Jobs.jobLanguages job
+                    H.td $ H.toHtml $ Jobs.jobPermalink job
+                    H.td $ H.toHtml $ Jobs.jobActiveStatus job
+          renderMarkdown model "jobs.md"
+        HtmlRoute_Resources -> do
+          renderMarkdown model "resources.md"
+      renderFooter rp model
 
 renderFooter :: Prism' FilePath Route -> Model -> H.Html
 renderFooter rp model = do
@@ -94,5 +95,5 @@ renderHead rp model r = do
   H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1"
   H.title $ H.toHtml $ routeTitle r <> " - Functional Programming India"
   H.base ! A.href "/"
-  -- H.script ! A.src (staticRouteUrl rp model "main.js") $ ""
+  H.script ! A.src (staticRouteUrl rp model "main.js") $ ""
   H.link ! A.rel "stylesheet" ! A.href (staticRouteUrl rp model "tailwind.css")
