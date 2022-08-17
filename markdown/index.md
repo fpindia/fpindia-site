@@ -26,6 +26,7 @@
 4. Some things to do while you are here -
 
     - Check out our [upcoming events](events.html)
-    - If you are looking for a job, head over to the [FP jobs board for people in India](jobs.html)
     - Join the conversation on [other platforms](connect.html)
+5. Things still under construction (***coming soon***!) -
     - Check out our list of [resources for functional programming](resources.html)
+    - If you are looking for a job, head over to the [FP jobs board for people in India](jobs.html)
