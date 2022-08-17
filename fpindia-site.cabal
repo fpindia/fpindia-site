@@ -1,10 +1,10 @@
 cabal-version:      2.4
 name:               fpindia-site
 version:            0.1.0.0
-license:            AGPL-3.0-only
-copyright:          2022 Sridhar Ratnakumar
-maintainer:         srid@srid.ca
-author:             Sridhar Ratnakumar
+license:            MIT
+copyright:          2022 Functional Programming India
+maintainer:         team@functionalprogramming.in
+author:             Functional Programming India
 category:           Web
 
 -- A short (one-line) description of the package.
