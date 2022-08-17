@@ -1,6 +1,6 @@
 # FPIndia Site
 
-WIP
+Source for https://functionalprogramming.in/
 
 Install Nix, enable Flakes (see below) and then run `bin/run` to get the site up and running locally. See further below for static site generation.
 
