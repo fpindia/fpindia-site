@@ -31,4 +31,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: output
-          cname: fpindia-site-master.haskell.page
+          cname: functionalprogramming.in
