@@ -1,6 +1,12 @@
 ## Upcoming Events
 
-We hold regular meetups, details will be uploaded soon.
+### FP India Pune Meetup Oct 2022
+
+The next FPIndia meetup will take place 1st Oct 2022 at Helpshift offices in Pune. More details will be uploaded soon. Reach to us in our Telegram group for any queries. No registration or confirmation required. You can turn up at the venue.
+
+| Date        | Time   | Venue                                                                                |
+| ----------- | ------ | ------------------------------------------------------------------------------------ |
+| Oct 1, 2022 | TBD    | Helpshift office Pune (Precise Venue details will be updated in the Telegram group). |
 
 ## Past Events
 
@@ -10,7 +16,7 @@ Folks at FP India group are organising a meetup after a long break of 2 years. F
 
 | Date          | Time     | Venue                                                                                |
 | ------------- | -------- | ------------------------------------------------------------------------------------ |
-| July 31, 2022 | 10:30 AM | Koramangala, Bengaluru (Precise Venue details will be updated in the Telgram group). |
+| July 31, 2022 | 10:30 AM | Koramangala, Bengaluru (Precise Venue details will be updated in the Telegram group). |
 
 ### TechTriveni 2.0
 
