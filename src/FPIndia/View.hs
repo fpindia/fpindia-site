@@ -75,6 +75,7 @@ renderFooter rp model = do
         footerLink "twitter.svg" "Youtube" "https://twitter.com/functionalindia"
         footerLink "telegram.svg" "Telegram" "https://t.me/fpncr"
         footerLink "discord.svg" "Discord" "https://discord.gg/sDHfscRdh7"
+        footerLinkWider 14 "matrix.svg" "Matrix" "https://matrix.to/#/#fpindia:matrix.org"
       H.div ! A.class_ "mb-2 flex space-x-2 text-sm text-gray-500 dark:text-gray-400" $ do
         H.div "Functional Programming India © 2022"
       H.div ! A.class_ "mb-8 text-sm text-gray-500 dark:text-gray-400" $ do
@@ -83,10 +84,11 @@ renderFooter rp model = do
         " and "
         H.a ! A.class_ "text-rose-700" ! A.target "_blank" ! A.rel "noopener noreferrer" ! A.href "https://ema.srid.ca/" $ "Ema"
   where
-    footerLink image altText url =
-      H.a ! A.class_ "text-sm text-gray-500 transition h-8 v-8" ! A.target "_blank" ! A.rel "noopener noreferrer" ! A.href url $ do
+    footerLink = footerLinkWider 6
+    footerLinkWider width image altText url =
+      H.a ! A.class_ ("text-sm text-gray-500 transition h-8 w-" <> show (width :: Int)) ! A.target "_blank" ! A.rel "noopener noreferrer" ! A.href url $ do
         H.span ! A.class_ "sr-only" $ altText
-        H.img ! A.class_ "fill-current text-gray-700 hover:border-b-2 hover:text-blue-500 dark:text-gray-200 dark:hover:text-blue-400 h-6 w-6" ! A.src (staticRouteUrl rp model image)
+        H.img ! A.class_ "fill-current text-gray-700 hover:border-b-2 hover:text-blue-500 dark:text-gray-200 dark:hover:text-blue-400 h-6" ! A.src (staticRouteUrl rp model image)
 
 renderHead :: Prism' FilePath Route -> Model -> HtmlRoute -> H.Html
 renderHead rp model r = do

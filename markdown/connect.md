@@ -8,9 +8,9 @@ We have the following three options for real time conversations with community m
 
 1. Most conversations currently take place on the [Telegram Group](https://t.me/fpncr).
 2. We have a nascent [Discord group](https://discord.com/invite/Ez3MU6W) which doesn't have as much going on at the present, but it does have the advantage of having channels, so you can choose only to read specific categories. This is also the place to discuss #offtopic stuff. You might also want to join the Discord group for discussions regarding ongoing Functional Programming courses.
-3. The FPIndia [Matrix Space](https://matrix.to/#/#fpindia:matrix.org) is very new, but is a good FOSS and privacy preseving option. We recommend using [Element](https://element.io/) cross platform client with it.
+3. The FPIndia [Matrix Space](https://matrix.to/#/#fpindia:matrix.org) is very new, but is a good FOSS and privacy preserving option. We recommend using [Element](https://element.io/) which is a cross platform matrix client.
 
-There are plans underway to bridge conversations across all these options, so you won't miss conversations regardless of which option you pick! If you would like to help out with those efforts, check out [ways to contribute to fpindia development](#contribute-to-fpindia-development).
+There are plans underway to bridge conversations across all these options, so you won't miss conversations regardless of which option you pick! If you would like to help out with those efforts, check out the section below on [contributing to fpindia development](#contribute-to-fpindia-development).
 
 ### Other social media
 
