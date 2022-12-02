@@ -23,8 +23,7 @@
               git;
             inherit (hp)
               cabal-fmt
-              fourmolu;
-            inherit (pkgs.haskellPackages)
+              fourmolu
               tailwind;
           };
           overrides = self: super: { };
