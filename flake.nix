@@ -11,10 +11,10 @@
       imports = [
         haskell-flake.flakeModule
       ];
-      perSystem = { self', inputs', pkgs, lib, ... }: {
+      perSystem = { self', config, inputs', pkgs, lib, ... }: {
         # "haskellProjects" comes from https://github.com/srid/haskell-flake
         haskellProjects.default = {
-          root = ./.;
+          packages.fpindia-site.root = ./.;
           buildTools = hp: {
             inherit (pkgs)
               treefmt
@@ -28,6 +28,7 @@
           };
           overrides = self: super: { };
         };
+        packages.default = config.packages.fpindia-site;
         apps.tailwind-run.program = "${lib.getExe pkgs.haskellPackages.tailwind}";
       };
     };
