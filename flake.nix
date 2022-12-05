@@ -3,25 +3,18 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
-
-    # Haskell overrides
-    ema.url = "github:srid/ema/0.8.0.0";
-    ema.flake = false;
-    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
+  outputs = { self, nixpkgs, flake-parts, haskell-flake, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
       ];
-      perSystem = { self', inputs', pkgs, ... }: {
+      perSystem = { self', config, inputs', pkgs, lib, ... }: {
         # "haskellProjects" comes from https://github.com/srid/haskell-flake
         haskellProjects.default = {
-          root = ./.;
+          packages.fpindia-site.root = ./.;
           buildTools = hp: {
             inherit (pkgs)
               treefmt
@@ -30,21 +23,13 @@
               git;
             inherit (hp)
               cabal-fmt
-              fourmolu;
-            inherit (inputs'.tailwind-haskell.packages)
+              fourmolu
               tailwind;
           };
-          source-overrides = {
-            inherit (inputs)
-              ema;
-          };
-          overrides = self: super: with pkgs.haskell.lib; {
-            ema = dontCheck super.ema;
-            inherit (inputs'.tailwind-haskell.packages)
-              tailwind;
-          };
+          overrides = self: super: { };
         };
-        apps.tailwind-run.program = "${inputs'.tailwind-haskell.packages.tailwind}/bin/tailwind-run";
+        packages.default = config.packages.fpindia-site;
+        apps.tailwind-run.program = "${lib.getExe pkgs.haskellPackages.tailwind}";
       };
     };
 }
