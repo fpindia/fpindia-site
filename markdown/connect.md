@@ -12,6 +12,10 @@ We have the following three options for real time conversations with community m
 
 There are plans underway to bridge conversations across all these options, so you won't miss conversations regardless of which option you pick! If you would like to help out with those efforts, check out the section below on [contributing to fpindia development](#contribute-to-fpindia-development).
 
+### Events and Meetup
+
+1. We have an [FPIndia HasGeek community](https://hasgeek.com/fpindia) where we organise events and post upcoming event announcements.
+
 ### Other social media
 
 Apart from that, you can engage with the community in the following ways -
