@@ -13,6 +13,7 @@ data HtmlRoute
   = HtmlRoute_Index
   | HtmlRoute_Events
   | HtmlRoute_ConnectWithUs
+  | HtmlRoute_Communities
   | HtmlRoute_FpJobsInIndia
   | HtmlRoute_Resources
   deriving stock (Show, Eq, Ord, Generic, Enum, Bounded)
@@ -25,6 +26,7 @@ deriveIsRoute
         '[ FileRoute "index.html"
          , FileRoute "events.html"
          , FileRoute "connect.html"
+         , FileRoute "communities.html"
          , FileRoute "jobs.html"
          , FileRoute "resources.html"
          ]

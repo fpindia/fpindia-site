@@ -19,6 +19,7 @@ routeHref rp r = fromString . toString $ Ema.routeUrlWith Ema.UrlPretty rp (Rout
 routeTitle :: HtmlRoute -> Text
 routeTitle r = case r of
   HtmlRoute_ConnectWithUs -> "Connect"
+  HtmlRoute_Communities -> "Communities"
   HtmlRoute_FpJobsInIndia -> "Jobs"
   HtmlRoute_Index -> "Home"
   HtmlRoute_Events -> "Events"

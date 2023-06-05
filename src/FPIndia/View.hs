@@ -35,6 +35,8 @@ renderBody rp model r = do
           renderMarkdown model "events.md"
         HtmlRoute_ConnectWithUs -> do
           renderMarkdown model "connect.md"
+        HtmlRoute_Communities -> do
+          renderMarkdown model "communities.md"
         HtmlRoute_FpJobsInIndia -> do
           H.div ! A.class_ "my-4" $ do
             H.img ! A.class_ "h-20 m-auto mb-5" ! A.src (staticRouteUrl rp model "underconstruction.svg")
