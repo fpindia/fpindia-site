@@ -6,27 +6,23 @@ There are many other sister communities related to FPIndia. The following is a l
 
 [Rust](https://www.rust-lang.org/) is a blazingly fast, strongly typed, imperative programming language that provides compile time guarantees about memory safety and thread-safety. Rust may be imperative, but its strong static type system and facilities for immutability and concurrency, earn it the badge of an honorary functional programming language!
 
-### Rust India
+### Rust Bangalore
 
-Connect with the Indian Rust community on the [Rust India Telegram group](https://t.me/RustIndia), or the [Rust India HasGeek page](https://hasgeek.com/rustlangin). They also have a [Rust India Discord](https://discord.gg/p3uaTXS6NP), a [Rust India LinkedIn](https://www.linkedin.com/company/rust-india/), and a [Rust India Twitter](https://twitter.com/rustlangin).
+The Rust community for people in Bangalore. Connect with them through the [Rust Bangalore community website](https://rustindia.github.io/). Other ways to connect are through the [Rust Bangalore Telegram group](https://t.me/RustIndia), the [Rust Bangalore HasGeek page](https://hasgeek.com/rustbangalore), and the [Rust India LinkedIn](https://www.linkedin.com/company/rust-india/).
 
-#### Rust Kerala
+### Rust Kerala
 
 Rust community for people in the state of Kerala. They have a [Rust Kerala Telegram group](https://t.me/keralars), as well as presence on [Rust Kerala LinkedIn](https://www.linkedin.com/company/kerala-rustaceans/), and [Rust Kerala Twitter](https://twitter.com/rustaceanstvm).
 
-#### Rust Bangalore
+### Rust Hyderabad
 
-There's a Rust community specifically for people within Bangalore. It uses the same community platforms as the umbrella Rust India group.
+The Rust community for people in Hyderabad. Join the [Rust Hyderabad Meetup Group](https://www.meetup.com/rust-hyderabad/).
 
-#### Rust Hyderabad
-
-The Rust community for people in Hyderabad. Join the [Rust Hyderabad Meetup Group](https://www.meetup.com/rust-hyderabad/), or use the same platforms as for Rust India.
-
-#### Rust Delhi
+### Rust Delhi
 
 The Rust community specifically for people within Delhi NCR. Join the [Rust Delhi Telegram Group](https://t.me/RustDelhi), or explore [other ways to connect](https://linktr.ee/rustdelhi).
 
-#### Rust Pune
+### Rust Pune
 
 The Rust community for people in Pune. Join the [Rust Pune Meetup Group](https://www.meetup.com/rust-pune), or use the same platforms as for Rust India.
 
