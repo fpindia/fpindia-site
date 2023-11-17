@@ -1,3 +1,5 @@
+# This is a modular Nix flake
+# Learn about it here: https://zero-to-flakes.com/
 {
   description = "Ema template app";
   inputs = {
@@ -5,17 +7,16 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
   };
-  outputs = { self, nixpkgs, flake-parts, haskell-flake, ... }:
-    flake-parts.lib.mkFlake { inherit self; } {
+  outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
       ];
-      perSystem = { self', config, inputs', pkgs, lib, ... }: {
+      perSystem = { self', inputs', pkgs, lib, ... }: {
         # "haskellProjects" comes from https://github.com/srid/haskell-flake
         haskellProjects.default = {
-          packages.fpindia-site.root = ./.;
-          buildTools = hp: {
+          devShell.tools = hp: {
             inherit (pkgs)
               treefmt
               nixpkgs-fmt
@@ -26,9 +27,10 @@
               fourmolu
               tailwind;
           };
-          overrides = self: super: { };
+          # Want to override Haskell dependencies?
+          # See https://zero-to-flakes.com/haskell-flake/dependency
         };
-        packages.default = config.packages.fpindia-site;
+        packages.default = self'.packages.fpindia-site;
         apps.tailwind-run.program = "${lib.getExe pkgs.haskellPackages.tailwind}";
       };
     };
