@@ -1,8 +1,8 @@
 # FPIndia Site
 
-Source for https://functionalprogramming.in/
+[Ema](https://ema.srid.ca/) static site for https://functionalprogramming.in/
 
-Install Nix, enable Flakes (see below) and then run `bin/run` to get the site up and running locally. See further below for static site generation.
+[Install Nix](https://flakular.in/install) and then run `bin/run` to get the site up and running locally. See further below for static site generation.
 
 ## Getting Started
 
