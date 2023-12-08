@@ -33,3 +33,7 @@ The Rust community for people in Pune. Join the [Rust Pune Meetup Group](https:/
 ### Elixir Delhi
 
 Connect with the Delhi Elixir community on the [Elixir Delhi Telegram group](https://t.me/elixirdelhi).
+
+## Nix / NixOS
+
+[NixOS Asia](https://nixos.asia/en) is a community of Nix and NixOS users, with meetups planned initially in Bangalore.
