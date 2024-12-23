@@ -64,7 +64,7 @@ cabal run fpindia-site -- gen /tmp/site
 Or simply -
 
 ```
-cabal run gen
+npm run gen
 ```
 
 ## Note
