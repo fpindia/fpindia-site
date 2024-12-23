@@ -1,0 +1,5 @@
+packages:
+  ./ema
+  ./ema-examples
+  ./ema-extra
+  ./ema-generics

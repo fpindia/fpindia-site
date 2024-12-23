@@ -1,0 +1,31 @@
+template:
+  urlStrategy: pretty
+  theme: pink
+  iconUrl: /favicon.svg
+  # Disable collapsing of folders since we don't have large number of notes.
+  sidebar:
+    collapsed: true
+
+pandoc:
+  rewriteClass:
+    # The "Next" navigation in series
+    last: mt-8 border-t-2 border-pink-500 pb-1 pl-1 bg-gray-50 rounded
+    next: py-2 text-xl italic font-bold
+    # For description of items in guide listing
+    item-intro: text-gray-500
+    note: bg-gray-100 px-4 py-1 rounded italic
+    stepback: border-2 border-gray-400 shadow-lg rounded px-4 pt-2 m-2 italic bg-gray-200 text-gray-600
+
+# Put page-specific metadata here. Override them in Markdown frontmatter or
+# per-folder YAML as necessary.
+page:
+  siteTitle: Ema
+  headHtml: |
+    <link rel="manifest" href="/static/manifest.json" />
+    <meta name="theme-color" content="#DB2777" />
+    <!-- highlight.js -->
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/hybrid.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/haskell.min.js" integrity="sha512-byZkqR8FeRucjNQnEDNvbtUWMmtJqmNGfwXMRwjGgSbtgo7cvqGkYLdjgSO3ig11xUjKhdP7AhFXPvTTUpaGYQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>hljs.highlightAll();</script>

@@ -31,7 +31,9 @@ executable fpindia-site
     , containers
     , data-default
     , directory
-    , ema             >=0.8
+    , ema
+    , ema-extra
+    , ema-generics
     , filepath
     , generic-optics
     , generics-sop
@@ -41,7 +43,7 @@ executable fpindia-site
     , sop-core
     , text
     , time
-    , unionmount      >=0.2
+    , unionmount
     , unliftio
 
   mixins:
