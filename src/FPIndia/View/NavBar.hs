@@ -20,6 +20,22 @@ import Text.Blaze.Html5 (
  )
 import Text.Blaze.Html5.Attributes (class_, href, id, src, type_)
 
+navbarItems :: [HtmlRoute]
+navbarItems =
+  [ HtmlRoute_Events
+  , HtmlRoute_ConnectWithUs
+  , HtmlRoute_Communities
+  , HtmlRoute_FpJobsInIndia
+  , HtmlRoute_Resources
+  ]
+
+routeToNavbarSection :: HtmlRoute -> HtmlRoute
+routeToNavbarSection route
+  | route `elem` navbarItems = route
+  | otherwise = case route of
+      HtmlRoute_Advent_2025 -> HtmlRoute_Events
+      _ -> HtmlRoute_Index
+
 renderNavbar :: Prism' FilePath Route -> Model -> HtmlRoute -> Html
 renderNavbar rp model currentRoute =
   header ! class_ "flex items-center justify-between py-10" $ do
@@ -31,16 +47,18 @@ renderNavbar rp model currentRoute =
           div ! class_ "hidden h-6 text-2xl font-semibold sm:block" $ "FPIndia"
     div ! class_ "flex items-center text-base leading-5" $ do
       div ! class_ "hidden sm:block" $ do
-        forM_ universe $ \r ->
-          let navItem = if r == currentRoute then NavItem_Active else NavItem_Normal
+        forM_ navbarItems $ \r ->
+          let navItem = if r == currentNav then NavItem_Active else NavItem_Normal
            in renderNavItem rp r navItem
       div ! class_ "sm:hidden" $ do
         button ! type_ "button" ! id "burger-button" ! class_ "ml-1 mr-1 h-8 w-8 rounded py-1" $ do img ! src (staticRouteUrl rp model "burger.svg")
         div ! id "burger-menu" ! class_ "fixed top-0 left-0 z-10 h-full w-full transform bg-gray-200 opacity-95 duration-300 ease-in-out dark:bg-gray-800 translate-x-full" $ do
           nav ! class_ "fixed mt-8 h-full" $ do
-            forM_ universe $ \r ->
-              let navItem = if r == currentRoute then NavItem_Active else NavItem_Normal
+            forM_ navbarItems $ \r ->
+              let navItem = if r == currentNav then NavItem_Active else NavItem_Normal
                in renderNavItemButton rp r navItem
+  where
+    currentNav = routeToNavbarSection currentRoute
 
 data NavItem = NavItem_Active | NavItem_Normal
   deriving stock (Eq, Show)

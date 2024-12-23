@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "concurrently  --kill-others \"ghcid\" \"npm run tailwind:watch\"",
+    "start": "concurrently  --kill-others \"ghcid\" \"npm run tailwind\"",
     "build": "cabal build",
     "gen": "mkdir -p prod && cabal run fpindia-site -- gen prod",
     "tailwind": "tailwind -i input.css -o static/tailwind.css --watch"

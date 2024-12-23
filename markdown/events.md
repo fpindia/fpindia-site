@@ -1,51 +1,57 @@
-## Upcoming and Current Events
+## Upcoming Meetups
 
 We hold regular meetups, details will be uploaded soon.
 
-### FP Web Conf (Ongoing) (In-person + Remote)
+## Current events
 
-FPWeb Conf is a Functional Programming conference for web development professionals. The conference will comprise of several events, both in-person and online, and will feature industry professionals who will share their experiences with adopting functional programming for web development in production.
+### FPIndia Advent Calendar January 2025 
 
-FPIndia is an official community partner, and the conference is edited by the organiser of FPIndia.
+[FPIndia Advent Calendar January 2025](advent/2025.html) is a month long event to share functional programming stories, experiences, and resources by the FPIndia community. The event is inspired by the [F# Advent Calendar](https://sergeytihon.com/2024/10/26/f-advent-calendar-in-english-2024/).
 
-Please visit the [FPWebConf HasGeek event page](https://hasgeek.com/jsfoo/fp-webconf/) for more information.
+The rules are -
+
+  - Choose a Functional Programming related topic for your blog post or youtube video and reserve the slot by messaging on [Telegram](https://t.me/fpncr), or [Twitter](https://x.com/functionalindia). Please note that you do not have to announce the topic until the date (but you can).
+  - Prepare a blog post or video in English or any regional Indian language.
+  - Publish your post on a specified date (according to the calendar).
+  - Post the link to your post on Telegram or Twitter with hashtags #FpIndia and #FPIndiaAdvent.
+
+## Past Events
+
+### FPIndia Learn Haskell Meetups (In-person)
+
+FPIndia Learn Haskell Meetups are a series of informal meetups to introduce people to Haskell. These took place in 2023-2024 in Gurgaon/Delhi NCR. They may be revived at some point if there is enough interest.
+
+
+### FP Web Conf (Remote)
+
+[FP Web Conf](https://hasgeek.com/jsfoo/fp-webconf/) was a series of events targeting FP web development professionals. The conference featured industry professionals who shared their experiences with adopting functional programming for web development in production. FPIndia was an official community partner, and the conference was edited by the organiser of FPIndia.
 
 | Date           | Event                                          | Details                                                                                                                                                                      |
 | -------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Feb  27, 2023  | Use PureScript a build your own UI framework   | George James from Juspay, talks about how they use PureScript in production                                                                                                  |
 | May  26, 2023  | Learnings from using F# in production at Clear | A conversation with Ankit Solanki, co-founder at Clear, about using F# in production at Clear (formerly Cleartax). The conversation is moderated by BG, founder at TeamOhana |
-| June  24, 2023 | In-person event in Bangalore at Juspay         | TBA                                                                                                                                                                          |
-### FPIndia Delhi Meetup (In-person)
 
-FPIndia will organise their first in-person meetup in Delhi after a gap of several years. The venue and agenda will be announced closer to the date.
+### Effect Systems Reading Group (Remote)
 
-| Date           | Event                | Details |
-| -------------- | -------------------- | ------- |
-| July  22, 2023 | FPIndia Delhi Meetup | TBA     |
+[Effect Systems Reading Group](https://hasgeek.com/fpindia/effect-systems-reading-group/) was a reading group to discuss effect systems in functional programming languages.
 
-### Effect Systems Reading Group (Ongoing) (Remote)
+Topics included - What is an “Effect System”? Why do they matter, what is the motivation and the theory behind them. How do you implement them in Functional Programming languages?
 
-A reading group to discuss effect systems in functional programming languages.
+The online meetup took place once every two weeks on Saturdays. 
 
-What is an “Effect System”? Why do they matter, what is the motivation and the theory behind them. How do you implement them in Functional Programming languages?
+The [FPIndia Telegram group](https://t.me/fpncr) has a dedicated channel to discuss material related to this reading group. You can participate in the discussion there even if you miss the online meetup.
 
-This is a reading / study group to discuss these topics, and more.
+These meetups may be revived in the future if there's enough interest.
 
-The online meetup shall take place once every two weeks on Saturdays. The link to join shall be shared on the [Effect Systems Meetup HasGeek Page](https://hasgeek.com/fpindia/effect-systems-reading-group/).
+### Algorithm Design with Haskell Reading Group (Remote)
 
-The FPIndia Telegram group has a dedicated channel to discuss material related to this reading group. You can participate in the discussion there even if you miss the online meetup.
+[Algorithms Meetup Group](https://hasgeek.com/fpindia/algorithm-design-with-haskell-reading-group/) was a reading group to discuss algorithms and data structure design in Haskell (and other functional programming languages).
 
-### Algorithm Design with Haskell Reading Group (Ongoing) (Remote)
+Topics included - What are the principles of designing pure functional algorithms? How do we implement them, and optimise them. Theoretical as well as practical concerns.
 
-A reading group to discuss algorithms and data structure design in Haskell (and other functional programming languages).
+The meetups started by by going through the “Algorithm Design with Haskell” book by Richard Bird and Jeremy Gibbons. And the online meetups took place once every two weeks on Saturdays.
 
-What are the principles of designing pure functional algorithms? How do we implement them, and optimise them. We’ll discuss theoretical as well as practical concerns.
-
-To start with, we’ll be going through the “Algorithm Design with Haskell” book by Richard Bird and Jeremy Gibbons.
-
-The online meetup shall take place once every two weeks on Saturdays. The link to join shall be shared on the [Algorithms Meetup HasGeek Page](https://hasgeek.com/fpindia/algorithm-design-with-haskell-reading-group/).
-
-The FPIndia Telegram group has a dedicated channel called “Algorithms Meetup” to discuss material related to this reading group. You can participate in the discussion there even if you miss the online meetup.
+The [FPIndia Telegram group](https://t.me/fpncr) has a dedicated channel called “Algorithms Meetup” to discuss material related to this reading group. You can participate in the discussion there even if you miss the online meetup.
 
 ## Past Events
 
@@ -80,3 +86,4 @@ RustyMonad was a Rust and FP focused event organised in collaboration with Mozil
 | Date         | Time             | Venue                                                                                  |
 | ------------ | ---------------- | -------------------------------------------------------------------------------------- |
 | Mar 14, 2020 | 11 AM to 1:30 PM | Janakpuri, Delhi (Precise Venue details shared with registered participants via email. |
+

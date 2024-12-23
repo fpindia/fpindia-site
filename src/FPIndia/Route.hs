@@ -16,6 +16,7 @@ data HtmlRoute
   | HtmlRoute_Communities
   | HtmlRoute_FpJobsInIndia
   | HtmlRoute_Resources
+  | HtmlRoute_Advent_2025
   deriving stock (Show, Eq, Ord, Generic, Enum, Bounded)
 
 deriveGeneric ''HtmlRoute
@@ -29,6 +30,7 @@ deriveIsRoute
          , FileRoute "communities.html"
          , FileRoute "jobs.html"
          , FileRoute "resources.html"
+         , FileRoute "advent/2025.html"
          ]
      ]
     |]

@@ -64,6 +64,8 @@ renderBody rp model r = do
           renderMarkdown model "jobs.md"
         HtmlRoute_Resources -> do
           renderMarkdown model "resources.md"
+        HtmlRoute_Advent_2025 -> do
+          renderMarkdown model "advent/2025.md"
       renderFooter rp model
 
 renderFooter :: Prism' FilePath Route -> Model -> H.Html

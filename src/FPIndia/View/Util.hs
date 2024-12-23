@@ -24,9 +24,10 @@ routeTitle r = case r of
   HtmlRoute_Index -> "Home"
   HtmlRoute_Events -> "Events"
   HtmlRoute_Resources -> "Resources"
+  HtmlRoute_Advent_2025 -> "Advent"
 
 -- | Link to a file under ./static
-staticRouteUrl :: IsString r => Prism' FilePath Route -> Model -> FilePath -> r
+staticRouteUrl :: (IsString r) => Prism' FilePath Route -> Model -> FilePath -> r
 staticRouteUrl rp m =
   SR.staticRouteUrl (rp % (_As @"Route_Static")) (modelStatic m)
 
@@ -41,7 +42,7 @@ renderMarkdown m fp =
     proseStyle = "rounded p-4 text-stone-800 prose-a:underline prose-a:decoration-rose-600 prose-a:decoration-solid prose-a:decoration-1 hover:prose-a:decoration-2"
 
 -- | Like `renderMarkdown` but without the prose styling
-renderMarkdown' :: HasCallStack => Model -> String -> H.Html
+renderMarkdown' :: (HasCallStack) => Model -> String -> H.Html
 renderMarkdown' m fp =
   case PR.lookupPandocRoute (modelMarkdown m) (fromString fp) of
     Nothing -> error $ "renderMarkdown: not a Pandoc ext: " <> toText fp

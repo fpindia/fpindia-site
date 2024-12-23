@@ -1,6 +1,11 @@
-## Welcome to FPIndia
-
-### The homepage for the Indian Functional Programming community
+<section class="text-center">
+<h1 class="text-center text-5xl font-serif !leading-tight">
+  Welcome to the<br/> Indian Functional Programming Community
+</h1>
+<div class="pb-4">
+  <a href="/advent/2025.html" class="rounded-2xl bg-yellow-100 px-4 py-1.5 font-serif text-red-700">NEW: Join the FPIndia Advent 2025!</a>
+</div>
+</section>
 
 <div style="display:flex">
 <div style="flex:50%; padding: 0 2em 0 0">
