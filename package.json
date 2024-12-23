@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "concurrently  --kill-others \"ghcid\" \"npm run tailwind:watch\"",
+    "build": "cabal build",
+    "gen": "mkdir -p prod && cabal run fpindia-site -- gen prod",
+    "tailwind": "tailwind -i input.css -o static/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/language-server": "^0.0.27",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/typography": "^0.5.15",
+    "concurrently": "^9.1.0",
+    "tailwindcss": "^3.4.17"
+  }
+}
