@@ -32,8 +32,6 @@ executable fpindia-site
     , data-default
     , directory
     , ema
-    , ema-extra
-    , ema-generics
     , filepath
     , generic-optics
     , generics-sop
