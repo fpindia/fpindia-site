@@ -35,10 +35,30 @@ All but the final step need to be done only once. Check [the Ema tutorial](https
 
 ## Non-Nix workflow
 
-To use this repository without Nix, such as with plain Cabal or Stack, you need to have the following installed manually:
+Working on this repository without Nix is supported.
 
-- ghcid (used by `bin/run-haskell` which `./Procfile` invokes)
-- [tailwind runner](https://hackage.haskell.org/package/tailwind) along with [tailwind CLI](https://tailwindcss.com/docs/installation)
-- [foreman](http://ddollar.github.io/foreman/) (or one of its rewrites)
+### Basic setup with Cabal
 
-Once all the above are installed, run `foreman start` to start the Ema live server.
+Some dependencies have been vendored in `vendor/` for non-nix workflows. The setup has been tested to work with GHC 9.4.8.
+
+To run the Ema live server -
+
+```
+cabal build
+cabal run
+```
+
+### Tailwind CSS support
+
+You must have installed the [tailwind runner](https://hackage.haskell.org/package/tailwind) along with [tailwind CLI](https://tailwindcss.com/docs/installation)
+
+```
+cd static && tailwind-run -w -o tailwind.css '../src/**/*.hs' 
+```
+
+### Hot code reloading
+
+If you have the Haskell LSP server setup and integrated with your preferred text editor, hot code reloading should work automatically.
+
+As a fallback, you can also use [ghcid](https://github.com/ndmitchell/ghcid). Run `bin/run-haskell` in a separate terminal.
+
