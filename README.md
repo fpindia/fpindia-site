@@ -6,11 +6,11 @@
 
 ## With Nix
 
-[Install Nix](https://flakular.in/install) and then run `bin/run` to get the site up and running locally. See further below for static site generation.
+[Install Nix][install-nix] and then run `bin/run` to get the site up and running locally. See further below for static site generation.
 
 To develop with full IDE support in Visual Studio Code, follow these steps:
 
-- [Install Nix](https://zero-to-flakes.com/install/)
+- [Install Nix][install-nix]
 - Run `nix develop -c haskell-language-server` to sanity check your environment
 - Open the repository [as single-folder workspace](https://code.visualstudio.com/docs/editor/workspaces#_singlefolder-workspaces) in Visual Studio Code
     - Install the recommended extensions
@@ -18,6 +18,8 @@ To develop with full IDE support in Visual Studio Code, follow these steps:
 - Press <kbd>Ctrl+Shift+B</kbd> in VSCode, or run `bin/run` in terminal, to launch the Ema dev server, and navigate to http://localhost:8081/
 
 All but the final step need to be done only once. Check [the Ema tutorial](https://ema.srid.ca/tutorial) next.
+
+[install-nix]: https://nixos.asia/en/install
 
 #### Generate the site
 
